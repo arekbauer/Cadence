@@ -1,18 +1,38 @@
 package com.arekb.cadence.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.arekb.cadence.data.repository.AuthRepository
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavigation(
+    authRepository: AuthRepository,
     loginViewModel: LoginViewModel,
     onLoginRequested: () -> Unit
 ) {
     val navController = rememberNavController()
+    val coroutineScope = rememberCoroutineScope()
+
+    // Check the login state asynchronously
+    LaunchedEffect(key1 = Unit) {
+        coroutineScope.launch {
+            if (authRepository.isLoggedIn()) {
+                // If logged in, navigate to home screen
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
+            }
+        }
+    }
+
+    // Start navigation is always login, the LaunchedEffect will navigate to home if logged in
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(

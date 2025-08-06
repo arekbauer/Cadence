@@ -47,7 +47,8 @@ class MainActivity : ComponentActivity() {
             CadenceTheme {
                 AppNavigation(
                     loginViewModel = loginViewModel,
-                    onLoginRequested = { launchSpotifyLogin() }
+                    onLoginRequested = { launchSpotifyLogin() },
+                    authRepository = authRepository
                 )
             }
         }

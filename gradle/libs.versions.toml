@@ -1,6 +1,7 @@
 [versions]
 agp = "8.9.1"
 converterGson = "2.11.0"
+datastorePreferences = "1.1.7"
 hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.0.21"
@@ -13,11 +14,15 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 retrofit = "3.1.0-SNAPSHOT"
 retrofitVersion = "2.11.0"
+securityCrypto = "1.1.0"
 volley = "1.2.1"
+datastoreCoreAndroid = "1.1.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
@@ -37,6 +42,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-v2110 = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofitVersion" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
