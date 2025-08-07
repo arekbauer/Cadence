@@ -20,4 +20,9 @@ interface AuthRepository {
      * This is now a suspend function because it reads from the asynchronous DataStore.
      */
     suspend fun isLoggedIn(): Boolean
+
+    /**
+     *
+     */
+    suspend fun refreshAccessToken(): Result<Unit>
 }

@@ -17,4 +17,13 @@ interface SpotifyAuthApiService {
         @Field("code") code: String,
         @Field("redirect_uri") redirectUri: String
     ): Response<TokenResponse>
+
+    @FormUrlEncoded
+    @POST("api/token")
+    suspend fun refreshAccessToken(
+        @Header("Authorization") authorization: String,
+        @Field("grant_type") grantType: String = "refresh_token",
+        @Field("refresh_token") refreshToken: String
+    ): Response<TokenResponse>
+
 }

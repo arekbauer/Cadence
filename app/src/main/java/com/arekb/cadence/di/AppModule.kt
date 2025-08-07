@@ -3,6 +3,7 @@ package com.arekb.cadence.di
 import com.arekb.cadence.data.remote.api.AuthInterceptor
 import com.arekb.cadence.data.remote.api.SpotifyApiService
 import com.arekb.cadence.data.remote.api.SpotifyAuthApiService
+import com.arekb.cadence.data.remote.api.TokenRefreshAuthenticator
 import com.arekb.cadence.data.repository.AuthRepository
 import com.arekb.cadence.data.repository.AuthRepositoryImpl
 import com.arekb.cadence.data.repository.UserRepository
@@ -13,6 +14,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
@@ -53,9 +55,10 @@ abstract class AppModule {
         // Main API
         @Provides
         @Singleton
-        fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
+        fun provideOkHttpClient(authenticator: TokenRefreshAuthenticator): OkHttpClient {
             return OkHttpClient.Builder()
-                .addInterceptor(authInterceptor)
+                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .authenticator(authenticator)
                 .build()
         }
 

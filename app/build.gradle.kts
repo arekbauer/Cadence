@@ -50,8 +50,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         compose = true
@@ -92,6 +94,7 @@ dependencies {
     implementation(libs.converter.gson)
     //noinspection UseTomlInstead
     implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
 
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.datastore.preferences)

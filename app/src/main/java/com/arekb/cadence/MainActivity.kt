@@ -1,6 +1,7 @@
 package com.arekb.cadence
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,9 +35,19 @@ class MainActivity : ComponentActivity() {
     ) { result ->
         val response = AuthorizationClient.getResponse(result.resultCode, result.data)
         when (response.type) {
-            AuthorizationResponse.Type.CODE -> response.code?.let { loginViewModel.onAuthCodeReceived(it) }
-            AuthorizationResponse.Type.ERROR -> { /* Handle error */ }
-            else -> { /* Handle other cases */ }
+            AuthorizationResponse.Type.CODE -> response.code?.let {
+                loginViewModel.onAuthCodeReceived(
+                    it
+                )
+            }
+            AuthorizationResponse.Type.TOKEN,
+            AuthorizationResponse.Type.EMPTY -> {
+                // Do nothing, stay on the login screen.
+            }
+            AuthorizationResponse.Type.UNKNOWN,
+            AuthorizationResponse.Type.ERROR -> {
+                 Toast.makeText(this, "Login error: ${response.error}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
