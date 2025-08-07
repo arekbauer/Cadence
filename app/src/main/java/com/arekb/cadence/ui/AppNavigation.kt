@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.arekb.cadence.data.repository.AuthRepository
+import com.arekb.cadence.ui.screens.home.HomeScreen
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
 import kotlinx.coroutines.launch
@@ -46,8 +47,7 @@ fun AppNavigation(
             )
         }
         composable("home") {
-            // Your main app screen will go here
-            androidx.compose.material3.Text("Welcome Home!")
+            HomeScreen()
         }
     }
 }
