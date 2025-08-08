@@ -4,9 +4,23 @@ Cadence is a modern Android application built to explore personal Spotify listen
 
 ## ✨ Features
 
-- Secure Spotify Login: Authenticate using the official Spotify Android SDK for a seamless and secure login experience. The app gracefully falls back to a web-based flow if the Spotify app is not installed.
+- Secure Spotify Login: Authenticate using the official Spotify Android SDK for a seamless
+  and secure login experience. The app gracefully falls back to a web-based flow if the Spotify app is not installed.
 
-  ...  (to be added)
+- Your Listening Stats: View your top tracks and top artists from different time periods: the
+  last month, the last six months, and the last 12 months.
+
+- Sonic Profile: Get a unique analysis of your musical taste. Cadence analyses the audio
+  features of your top tracks to reveal your personal "sonic profile," showing you whether you lean towards music that is energetic, danceable, acoustic, or happy.
+
+- Genre Deep Dive: Discover the micro-genres that define your listening habits. Cadence goes
+  beyond broad categories to show you a ranked list of your most-played specific genres, from "permanent wave" to "garage rock revival."
+
+- Intelligent Recommendations: Get song recommendations based on a selection of your favourite
+  tracks or artists. Perfect for building the ultimate playlist.
+
+- New Release Radar: Never miss a new drop from your favorite artists. Cadence checks for new
+  albums and singles from the artists you follow and listen to most, keeping you up-to-date.
   
 ## 🛠️ Tech Stack & Architecture
 
