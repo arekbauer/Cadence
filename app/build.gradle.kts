@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = "com.arekb.cadence"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.arekb.cadence"
@@ -50,8 +50,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+        }
     }
     buildFeatures {
         compose = true
@@ -85,11 +87,14 @@ dependencies {
 
     // Spotify
     //noinspection UseTomlInstead
-    implementation("com.spotify.android:auth:2.1.1")
+    implementation("com.spotify.android:auth:2.1.2")
 
     // Retrofit
     implementation(libs.retrofit.v2110)
     implementation(libs.converter.gson)
+    //noinspection UseTomlInstead
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
 
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.datastore.preferences)
