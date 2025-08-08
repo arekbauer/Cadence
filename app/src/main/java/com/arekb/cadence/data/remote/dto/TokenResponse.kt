@@ -3,7 +3,7 @@ package com.arekb.cadence.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 /**
- * Represents the successful JSON response from Spotify's token endpoint.
+ * Represents the successful JSON response from Spotify's token endpoint
  */
 data class TokenResponse(
     @SerializedName("access_token")

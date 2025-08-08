@@ -26,14 +26,10 @@ class HomeViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<HomeViewEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    init {
-        fetchUserProfile()
-    }
-
     /**
      * Fetches the user profile from the repository and updates the UI state.
-     */
-    private fun fetchUserProfile() {
+     **/
+    fun fetchUserProfile() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
