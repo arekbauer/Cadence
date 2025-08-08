@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,13 +21,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    onNavigateToStats: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val navController = rememberNavController()
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchUserProfile()
@@ -62,6 +66,10 @@ fun HomeScreen(
 
                     Text(text = "Welcome back,")
                     Text(text = uiState.username!!)
+
+                    Button(onClick = onNavigateToStats ) {
+                        Text("View My Top Tracks")
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.arekb.cadence.data.repository
 
+import com.arekb.cadence.data.remote.dto.TopItemsResponse
 import com.arekb.cadence.data.remote.dto.UserProfile
 
 /**
@@ -16,4 +17,6 @@ interface UserRepository {
      * or an exception on failure.
      */
     suspend fun getProfile(): Result<UserProfile>
+
+    suspend fun getTopTracks(timeRange: String, limit: Int): Result<TopItemsResponse>
 }

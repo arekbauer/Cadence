@@ -13,6 +13,7 @@ import com.arekb.cadence.ui.screens.home.HomeViewEvent
 import com.arekb.cadence.ui.screens.home.HomeViewModel
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
+import com.arekb.cadence.ui.screens.stats.StatsScreen
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
@@ -66,7 +67,15 @@ fun AppNavigation(
             )
         }
         composable("home") {
-            HomeScreen(viewModel = homeViewModel)
+            HomeScreen(
+                viewModel = homeViewModel,
+                onNavigateToStats = {
+                    navController.navigate("stats")
+                }
+            )
+        }
+        composable("stats") {
+            StatsScreen()
         }
     }
 }
