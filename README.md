@@ -34,12 +34,10 @@ To build and run this project yourself, you will need to provide your own Spotif
 
     Configure Your App: In the Spotify Dashboard settings for your app, add the following Redirect URI: cadence-app://callback.
 
-    Create local.properties: In the root directory of this project, create a file named local.properties.
-
     Add Your Keys: Add your credentials to the local.properties file like this:
 
-    SPOTIFY_CLIENT_ID="your_spotify_client_id_here"
-    SPOTIFY_CLIENT_SECRET="your_spotify_client_secret_here"
+    SPOTIFY_CLIENT_ID=your_spotify_client_id_here
+    SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
 
     Sync the project in Android Studio, and you should be ready to build and run the app.
 
@@ -47,13 +45,13 @@ To build and run this project yourself, you will need to provide your own Spotif
 
 This project is currently a work in progress.
 
-Phase 1: Foundation & Authentication (In Progress)
+Phase 1: Foundation & Authentication (Complete)
 
     Project setup with Hilt and MVVM.
 
     Secure Spotify login and session persistence.
 
-Next Steps: Phase 2 - "Statify" Feature
+Phase 2 - "Statify" Features (In Progress)
 
     Fetch and display user's top tracks and artists.
 
