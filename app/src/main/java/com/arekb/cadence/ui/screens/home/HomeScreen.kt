@@ -45,27 +45,31 @@ fun HomeScreen(
                 CircularProgressIndicator()
             }
             uiState.error != null -> {
-                Text(text = "Error loading profile: " + uiState.error!!)
+                Column {
+                    Text(text = "Error loading profile: " + uiState.error!!)
+                    Button(onClick = { viewModel.fetchUserProfile() }) {
+                        Text("Retry")
+                    }
+                }
             }
-            uiState.username != null -> {
+            uiState.userProfile != null -> {
+                val user = uiState.userProfile
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    uiState.profileImageUrl?.let { imageUrl ->
-                        AsyncImage(
-                            model = imageUrl,
-                            contentDescription = "User Profile Picture",
-                            modifier = Modifier
-                                .size(120.dp)
-                                .clip(CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
+                    AsyncImage(
+                        model = user?.imageUrl,
+                        contentDescription = "User Profile Picture",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Text(text = "Welcome back,")
-                    Text(text = uiState.username!!)
+                    Text(text = user?.displayName ?: "Default")
 
                     Button(onClick = onNavigateToStats ) {
                         Text("View My Top Tracks")
