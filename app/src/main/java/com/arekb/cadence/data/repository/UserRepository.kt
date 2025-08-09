@@ -1,8 +1,7 @@
 package com.arekb.cadence.data.repository
 
+import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
-import com.arekb.cadence.data.remote.dto.TopItemsResponse
-import com.arekb.cadence.data.remote.dto.UserProfile
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -16,5 +15,5 @@ interface UserRepository {
      */
     fun getProfile(): Flow<Result<UserProfileEntity?>>
 
-    suspend fun getTopTracks(timeRange: String, limit: Int): Result<TopItemsResponse>
+    fun getTopTracks(timeRange: String, limit: Int): Flow<Result<List<TopTracksEntity>?>>
 }
