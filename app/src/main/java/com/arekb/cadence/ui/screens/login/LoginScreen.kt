@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
@@ -45,7 +49,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             if (uiState.isLoading) {
-                CircularProgressIndicator()
+                CircularWavyProgressIndicator()
             } else {
                 Button(onClick = { viewModel.onLoginClicked() }) {
                     Text("Connect with Spotify")
