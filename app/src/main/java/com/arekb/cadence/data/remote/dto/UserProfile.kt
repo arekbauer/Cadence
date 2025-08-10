@@ -24,7 +24,7 @@ data class UserProfile(
     val displayName: String,
 
     @SerializedName("email")
-    val email: String,
+    val email: String?,
 
     @SerializedName("id")
     val id: String,

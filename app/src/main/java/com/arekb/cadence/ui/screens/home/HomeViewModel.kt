@@ -3,6 +3,7 @@ package com.arekb.cadence.ui.screens.home
 import androidx.datastore.core.IOException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arekb.cadence.data.local.database.entity.UserProfileEntity
 import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,52 +32,34 @@ class HomeViewModel @Inject constructor(
      **/
     fun fetchUserProfile() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                val result = userRepository.getProfile()
-                result.onSuccess { userProfile ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            username = userProfile.displayName,
-                            profileImageUrl = userProfile.images.firstOrNull()?.url
-                        )
-                    }
-                }.onFailure { exception ->
-                    // Check for a 401 error, which means the refresh failed and we need to log out
-                    if (exception is HttpException && exception.code() == 401) {
-                        _eventFlow.emit(HomeViewEvent.NavigateToLogin)
-                    } else {
-                        // Handle other errors (no internet, server down)
-                        _uiState.update {
-                            it.copy(isLoading = false, error = "Could not load profile. Please try again.")
+            userRepository.getProfile()
+                .collect { result ->
+                    result.fold(
+                        onSuccess = { user ->
+                            _uiState.update {
+                                if (user != null) {
+                                    HomeUiState(isLoading = false, userProfile = user)
+                                } else {
+                                    HomeUiState(isLoading = true)
+                                }
+                            }
+                        },
+                        onFailure = {
+                            _uiState.update {
+                                HomeUiState(isLoading = false, error = "Failed to load profile.")
+                            }
                         }
-                    }
+                    )
                 }
-            } catch (e: IOException) {
-                // Handle network errors (no internet, server down)
-                _uiState.update {
-                    it.copy(isLoading = false, error = "Could not load profile. Please try again. $e")
-                }
-            }
         }
     }
-}
 
-/**
- * Represents the UI state of the home screen.
- *
- * @param isLoading True if the profile is being loaded, false otherwise.
- * @param username The display name of the user.
- * @param profileImageUrl The URL of the user's profile image.
- * @param error A message describing an error that occurred, or null if there was no error.
- */
-data class HomeUiState(
-    val isLoading: Boolean = true,
-    val username: String? = null,
-    val profileImageUrl: String? = null,
-    val error: String? = null
-)
+    data class HomeUiState(
+        val isLoading: Boolean = true,
+        val userProfile: UserProfileEntity? = null,
+        val error: String? = null
+    )
+}
 
 sealed interface HomeViewEvent {
     object NavigateToLogin : HomeViewEvent
