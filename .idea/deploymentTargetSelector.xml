@@ -5,16 +5,19 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Toolbar">
+      <SelectionState runConfigName="NowPlayingCardPreview - Now Playing Card">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ListWithFloatingActionButton">
+      <SelectionState runConfigName="ImmersiveTrackHeroPreview - Immersive Hero">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="ButtonGroupSample">
+      <SelectionState runConfigName="VinylTrackDisplayPreview - Vinyl Display">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="MultiSelectConnectedButtonGroupSample">
+      <SelectionState runConfigName="TopTrackTrophyCardPreview - #1 Trophy Card">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="TopPlayedTrackPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

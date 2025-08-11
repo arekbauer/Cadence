@@ -53,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -130,10 +131,23 @@ fun StatsScreen(
                                     Spacer(modifier = Modifier.height(16.dp))
                                 }
                                 item{
-                                    ThreeTwoCard(track2 = uiState.topTracks[1], track3 = uiState.topTracks[2])
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
+                                    {
+                                        ThreeTwoCard(
+                                            track = uiState.topTracks[1],
+                                            shape = MaterialShapes.Cookie7Sided.toShape(),
+                                            Modifier.weight(1f)
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        ThreeTwoCard(
+                                            track = uiState.topTracks[2],
+                                            MaterialShapes.Sunny.toShape(),
+                                            Modifier.weight(1f)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
                             }
-
                             itemsIndexed(uiState.topTracks.drop(3)) { index, track ->
                                 TrackRow(rank = index + 4, track = track)
                             }
@@ -176,154 +190,149 @@ fun StatsScreen(
     )
 }
 
+// TODO: Add animations?
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TopTrackHeroCard(track: TopTracksEntity) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .padding(end = 16.dp)
-                    .size(36.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        shape = MaterialShapes.Cookie7Sided.toShape()
-                    ),
-                contentAlignment = Alignment.Center,
-                ) {
-                Text(
-                    text = track.rank.toString(),
-                    style = MaterialTheme.typography.titleLargeEmphasized,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-            // --- Album Art ---
-            AsyncImage(
-                model = track.imageUrl,
-                contentDescription = "Album art for ${track.trackName}",
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            )
-
-            Spacer(modifier = Modifier.width(20.dp))
-
             // --- Text Content ---
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center
+            Column(modifier = Modifier.padding(8.dp).weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            shape = MaterialShapes.SoftBurst.toShape()
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    // Rank 1
+                    Text(
+                        text = track.rank.toString(),
+                        style = MaterialTheme.typography.headlineMediumEmphasized,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = track.trackName,
-                    style = MaterialTheme.typography.headlineSmallEmphasized,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineMediumEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = track.artistNames,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            Spacer(modifier = Modifier.width(64.dp))
+            // --- Album Art ---
+            AsyncImage(
+                model = track.imageUrl,
+                contentDescription = "Album art for ${track.trackName}",
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(130.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
         }
     }
 }
 
-//TODO: Finish creating!
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ThreeTwoCard(track2: TopTracksEntity, track3: TopTracksEntity) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
-    {
-        // 2nd Track
-        Card(
-            modifier = Modifier.weight(1f),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            ),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally)
-            {
-                AsyncImage(
-                    model = track2.imageUrl,
-                    contentDescription = "Album art for ${track2.trackName}",
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(text = track2.trackName)
-                Text(text = track2.artistNames)
-                Text(text = track2.rank.toString())
-            }
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        // 3rd Track
-        Card(
-            modifier = Modifier.weight(1f),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            ),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Column(modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally)
-            {
-                AsyncImage(
-                    model = track3.imageUrl,
-                    contentDescription = "Album art for ${track3.trackName}",
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(text = track3.trackName)
-                Text(text = track3.artistNames)
-                Text(text = track3.rank.toString())
-            }
-        }
-    }
-}
+fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
 
+        // 2nd and 3rd Track
+        Card(
+            modifier = modifier,
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            ),
+            shape = RoundedCornerShape(24.dp)
+        ) {
+            Column(modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally)
+            {
+                AsyncImage(
+                    model = track.imageUrl,
+                    contentDescription = "Album art for ${track.trackName}",
+                    modifier = Modifier
+                        .size(125.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = track.trackName,
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = track.artistNames,
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(36.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            shape = shape
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = track.rank.toString(),
+                        style = MaterialTheme.typography.titleLargeEmphasized,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                }
+            }
+        }
+}
 
 @Composable
 fun TrackRow(rank: Int, track: TopTracksEntity) {
     ListItem(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)) // Add rounded corners to the whole row
+            .padding(bottom = 4.dp)
+            .clip(RoundedCornerShape(12.dp))
             .clickable { /* Handle track click if needed */ },
-        // --- Leading Content: The Album Art ---
+        // --- Leading Content: The Rank ---
         leadingContent = {
-            // Use a Card for a subtle, clean boundary around the image
-            Card(
-                modifier = Modifier.size(56.dp),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                AsyncImage(
-                    model = track.imageUrl,
-                    contentDescription = "Album art for ${track.trackName}",
-                )
-            }
+            Text(
+                text = "$rank",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
         },
         // --- Headline Content: The Track Name ---
         headlineContent = {
@@ -341,14 +350,17 @@ fun TrackRow(rank: Int, track: TopTracksEntity) {
                 style = MaterialTheme.typography.bodyMedium
             )
         },
-        // --- Trailing Content: The Rank ---
+        // --- Trailing Content: The Album Art ---
         trailingContent = {
-            Text(
-                text = "$rank",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
+            Card(
+                modifier = Modifier.size(56.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                AsyncImage(
+                    model = track.imageUrl,
+                    contentDescription = "Album art for ${track.trackName}",
+                )
+            }
         }
     )
 }
