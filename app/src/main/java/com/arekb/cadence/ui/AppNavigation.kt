@@ -14,7 +14,6 @@ import com.arekb.cadence.ui.screens.home.HomeViewModel
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
 import com.arekb.cadence.ui.screens.stats.StatsScreen
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -75,7 +74,11 @@ fun AppNavigation(
             )
         }
         composable("stats") {
-            StatsScreen()
+            StatsScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
         }
     }
 }
