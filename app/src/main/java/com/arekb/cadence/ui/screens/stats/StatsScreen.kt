@@ -56,6 +56,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -109,6 +110,7 @@ fun StatsScreen(
             ) {
                 when {
                     uiState.isLoading -> {
+                        //TODO: Create skeletons of page instead of showing loading animation
                         CircularWavyProgressIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                     uiState.error != null -> {
@@ -214,17 +216,17 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
             ) {
                 Box(
                     modifier = Modifier
-                        .size(50.dp)
+                        .size(54.dp)
                         .background(
                             color = MaterialTheme.colorScheme.onSurface,
-                            shape = MaterialShapes.SoftBurst.toShape()
+                            shape = MaterialShapes.Flower.toShape()
                         ),
                     contentAlignment = Alignment.Center,
                 ) {
                     // Rank 1
                     Text(
                         text = track.rank.toString(),
-                        style = MaterialTheme.typography.headlineMediumEmphasized,
+                        style = MaterialTheme.typography.headlineLargeEmphasized,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
@@ -240,10 +242,11 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = track.artistNames,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
             }
             Spacer(modifier = Modifier.width(64.dp))
@@ -270,7 +273,8 @@ fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ),
-            shape = RoundedCornerShape(24.dp)
+            shape = RoundedCornerShape(24.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(modifier = Modifier.padding(8.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally)
@@ -285,13 +289,13 @@ fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = track.trackName,
-                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    style = MaterialTheme.typography.titleMediumEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = track.artistNames,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -300,7 +304,7 @@ fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
-                        .size(36.dp)
+                        .size(40.dp)
                         .background(
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
                             shape = shape
@@ -317,6 +321,7 @@ fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
         }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TrackRow(rank: Int, track: TopTracksEntity) {
     ListItem(
@@ -328,10 +333,9 @@ fun TrackRow(rank: Int, track: TopTracksEntity) {
         // --- Leading Content: The Rank ---
         leadingContent = {
             Text(
-                text = "$rank",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                text = rank.toString().padStart(2, '0'),
+                style = MaterialTheme.typography.titleMediumEmphasized,
+                color = MaterialTheme.colorScheme.primary,
             )
         },
         // --- Headline Content: The Track Name ---

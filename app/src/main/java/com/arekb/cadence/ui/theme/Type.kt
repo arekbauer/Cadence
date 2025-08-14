@@ -2,9 +2,11 @@ package com.arekb.cadence.ui.theme
 
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.arekb.cadence.R
@@ -13,9 +15,17 @@ import com.arekb.cadence.R
  *  Defines the brand typeface using the variable font Roboto Flex.
  *  This font will be used for expressive text styles.
  */
-val RobotoFlex = FontFamily(
-    Font(R.font.roboto_flex_family)
-)
+@OptIn(ExperimentalTextApi::class)
+val RobotoFlex =
+    FontFamily(
+        Font(
+            R.font.roboto_flex_family,
+            variationSettings = FontVariation.Settings(
+                FontVariation.weight(900),
+                FontVariation.width(125f),
+            )
+        )
+    )
 
 /**
  *  Defines the default typeface for the app.
@@ -124,6 +134,13 @@ val AppTypography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
+    titleLargeEmphasized = TextStyle(
+        fontFamily = RobotoFlex,
+        fontWeight = FontWeight.Black,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
     titleMedium = TextStyle(
         fontFamily = DefaultFontFamily,
         fontWeight = FontWeight.Medium,
@@ -131,9 +148,23 @@ val AppTypography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.15.sp
     ),
+    titleMediumEmphasized = TextStyle(
+        fontFamily = RobotoFlex,
+        fontWeight = FontWeight.Black,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.15.sp
+    ),
     titleSmall = TextStyle(
         fontFamily = DefaultFontFamily,
         fontWeight = FontWeight.Medium,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp
+    ),
+    titleSmallEmphasized = TextStyle(
+        fontFamily = RobotoFlex,
+        fontWeight = FontWeight.Black,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
