@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
@@ -45,7 +44,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 
@@ -69,7 +68,7 @@ fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val lazyListState = rememberLazyListState()
     var selectedTimeRange by remember { mutableStateOf("short_term") }
@@ -111,7 +110,7 @@ fun StatsScreen(
                 when {
                     uiState.isLoading -> {
                         //TODO: Create skeletons of page instead of showing loading animation
-                        CircularWavyProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        StatsScreenSkeleton(innerPadding = innerPadding)
                     }
                     uiState.error != null -> {
                         Text(text = uiState.error!!, modifier = Modifier.align(Alignment.Center))
@@ -211,7 +210,7 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // --- Text Content ---
-            Column(modifier = Modifier.padding(8.dp).weight(1f),
+            Column(modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
@@ -234,7 +233,7 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
 
                 Text(
                     text = track.trackName,
-                    style = MaterialTheme.typography.headlineMediumEmphasized,
+                    style = MaterialTheme.typography.titleLargeEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -249,7 +248,7 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
                     textAlign = TextAlign.Center
                 )
             }
-            Spacer(modifier = Modifier.width(64.dp))
+            Spacer(modifier = Modifier.width(32.dp))
             // --- Album Art ---
             AsyncImage(
                 model = track.imageUrl,
@@ -289,7 +288,7 @@ fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = track.trackName,
-                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    style = MaterialTheme.typography.titleSmallEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

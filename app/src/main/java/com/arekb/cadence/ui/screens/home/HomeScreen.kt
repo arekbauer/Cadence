@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -32,7 +32,6 @@ fun HomeScreen(
     onNavigateToStats: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val navController = rememberNavController()
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchUserProfile()
@@ -70,8 +69,8 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(text = "Welcome back,")
-                    Text(text = user?.displayName ?: "Default")
+                    Text(text = "Welcome back", style = MaterialTheme.typography.headlineLarge)
+                    Text(text = user?.displayName ?: "Default", style = MaterialTheme.typography.headlineLarge)
 
                     Button(onClick = onNavigateToStats) {
                         Text("View My Top Tracks")
