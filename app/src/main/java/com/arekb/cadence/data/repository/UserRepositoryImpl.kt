@@ -50,10 +50,11 @@ class UserRepositoryImpl @Inject constructor(
                     if (response.isSuccessful && response.body() != null) {
                         val topTracksDto = response.body()!!
                         val topTracksEntities = topTracksDto.items.map { track ->
+                        val allArtistNames = track.artists.joinToString(", ") { it.name }
                             TopTracksEntity(
                                 id = track.id,
                                 trackName = track.name,
-                                artistNames = track.artists.firstOrNull()?.name ?: "Unknown Artist",
+                                artistNames = allArtistNames.ifEmpty { "Unknown Artist" },
                                 imageUrl = track.album.images.firstOrNull()?.url ?: "",
                                 timeRange = timeRange,
                                 rank = topTracksDto.items.indexOf(track) + 1,
