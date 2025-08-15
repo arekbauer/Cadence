@@ -22,20 +22,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.arekb.cadence.ui.screens.util.shimmer
+import com.arekb.cadence.ui.screens.common.shimmer
 
 /**
  * The main skeleton layout that mimics the structure of the real screen.
  */
 @Composable
-fun StatsScreenSkeleton(innerPadding: PaddingValues) {
+fun StatsScreenSkeleton() {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
-            top = innerPadding.calculateTopPadding(),
+            top = 4.dp,
             start = 16.dp,
             end = 16.dp,
-            bottom = 16.dp
         ),
         userScrollEnabled = false // Disable scrolling for the skeleton
     ) {

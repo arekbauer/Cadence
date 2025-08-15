@@ -16,4 +16,6 @@ interface UserRepository {
     fun getProfile(): Flow<Result<UserProfileEntity?>>
 
     fun getTopTracks(timeRange: String, limit: Int): Flow<Result<List<TopTracksEntity>?>>
+
+    suspend fun forceRefreshTopTracks(timeRange: String): Result<Unit>
 }

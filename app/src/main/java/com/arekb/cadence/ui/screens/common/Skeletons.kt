@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.util
+package com.arekb.cadence.ui.screens.common
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode

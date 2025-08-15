@@ -50,6 +50,18 @@ class StatsViewModel @Inject constructor(
                 }
         }
     }
+
+    /**
+     * Called by the UI to trigger a forced refresh.
+     */
+    fun onRefresh(timeRange: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            userRepository.forceRefreshTopTracks(timeRange)
+
+            _uiState.update { it.copy(isLoading = false) }
+        }
+    }
 }
 
 data class StatsUiState(

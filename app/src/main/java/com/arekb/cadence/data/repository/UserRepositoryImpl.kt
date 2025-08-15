@@ -54,7 +54,7 @@ class UserRepositoryImpl @Inject constructor(
                             TopTracksEntity(
                                 id = track.id,
                                 trackName = track.name,
-                                artistNames = allArtistNames.ifEmpty { "Unknown Artist" },
+                                artistNames = allArtistNames.ifEmpty { "Unknown" },
                                 imageUrl = track.album.images.firstOrNull()?.url ?: "",
                                 timeRange = timeRange,
                                 rank = topTracksDto.items.indexOf(track) + 1,
@@ -76,6 +76,38 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
     )
+
+    override suspend fun forceRefreshTopTracks(timeRange: String): Result<Unit> {
+        return try {
+            // 1. Directly call the API
+            val response = api.getTopTracks(timeRange, 20)
+
+            if (response.isSuccessful && response.body() != null) {
+                // 2. Map the network response to database entities
+                val topTracksDto = response.body()!!
+                val topTracksEntities = topTracksDto.items.map { track ->
+                    val allArtistNames = track.artists.joinToString(", ") { it.name }
+                    TopTracksEntity(
+                        id = track.id,
+                        trackName = track.name,
+                        artistNames = allArtistNames.ifEmpty { "Unknown" },
+                        imageUrl = track.album.images.firstOrNull()?.url ?: "",
+                        timeRange = timeRange,
+                        rank = topTracksDto.items.indexOf(track) + 1,
+                        lastFetched = System.currentTimeMillis()
+                    )
+                }
+                // 3. Save the new data to the database
+                tracksDao.clearTopTracks(timeRange)
+                tracksDao.insertTopTracks(topTracksEntities)
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Failed to refresh top tracks"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
 
 private val CACHE_EXPIRATION_MS = TimeUnit.HOURS.toMillis(1)

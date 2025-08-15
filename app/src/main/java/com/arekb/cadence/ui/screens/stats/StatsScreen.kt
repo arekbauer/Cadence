@@ -41,12 +41,16 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +65,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -77,6 +82,17 @@ fun StatsScreen(
         "6 Months" to "medium_term",
         "12 Months" to "long_term"
     )
+
+    val coroutineScope = rememberCoroutineScope()
+    val state = rememberPullToRefreshState()
+    var isRefreshing by remember { mutableStateOf(false) }
+    val onRefresh: () -> Unit = {
+        isRefreshing = true
+        coroutineScope.launch {
+            viewModel.onRefresh(selectedTimeRange)
+            isRefreshing = false
+        }
+    }
 
     // This LaunchedEffect will run once initially, and then again whenever
     // the selectedIndex changes, triggering a new data fetch.
@@ -104,53 +120,73 @@ fun StatsScreen(
                 scrollBehavior = scrollBehavior,
             )
         },
-        content = { innerPadding ->
+        content = {
             Box(Modifier.fillMaxSize()
             ) {
-                when {
-                    uiState.isLoading -> {
-                        //TODO: Create skeletons of page instead of showing loading animation
-                        StatsScreenSkeleton(innerPadding = innerPadding)
-                    }
-                    uiState.error != null -> {
-                        Text(text = uiState.error!!, modifier = Modifier.align(Alignment.Center))
-                    }
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            state = lazyListState,
-                            contentPadding = PaddingValues(
-                                top = innerPadding.calculateTopPadding(),
-                                start = 16.dp,
-                                end = 16.dp,
-                                bottom = 16.dp
+                PullToRefreshBox(
+                    modifier = Modifier.padding(it),
+                    state = state,
+                    isRefreshing = isRefreshing,
+                    onRefresh = onRefresh,
+                    indicator = {
+                        PullToRefreshDefaults.LoadingIndicator(
+                            state = state,
+                            isRefreshing = isRefreshing,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                        )
+                    },
+                ) {
+                    when {
+                        uiState.isLoading || uiState.topTracks.isEmpty() -> {
+                            StatsScreenSkeleton()
+                        }
+
+                        uiState.error != null -> {
+                            Text(
+                                text = uiState.error!!,
+                                modifier = Modifier.align(Alignment.Center)
                             )
-                        ) {
-                            if (uiState.topTracks.isNotEmpty()) {
-                                item {
-                                    TopTrackHeroCard(track = uiState.topTracks.first())
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                }
-                                item{
-                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
-                                    {
-                                        ThreeTwoCard(
-                                            track = uiState.topTracks[1],
-                                            shape = MaterialShapes.Cookie7Sided.toShape(),
-                                            Modifier.weight(1f)
-                                        )
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        ThreeTwoCard(
-                                            track = uiState.topTracks[2],
-                                            MaterialShapes.Sunny.toShape(),
-                                            Modifier.weight(1f)
-                                        )
+                        }
+
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                state = lazyListState,
+                                contentPadding = PaddingValues(
+                                    top = 4.dp,
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                )
+                            ) {
+                                if (uiState.topTracks.isNotEmpty()) {
+                                    item {
+                                        TopTrackHeroCard(track = uiState.topTracks.first())
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    item {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        )
+                                        {
+                                            ThreeTwoCard(
+                                                track = uiState.topTracks[1],
+                                                shape = MaterialShapes.Cookie7Sided.toShape(),
+                                                Modifier.weight(1f)
+                                            )
+                                            Spacer(modifier = Modifier.width(16.dp))
+                                            ThreeTwoCard(
+                                                track = uiState.topTracks[2],
+                                                MaterialShapes.Sunny.toShape(),
+                                                Modifier.weight(1f)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
                                 }
-                            }
-                            itemsIndexed(uiState.topTracks.drop(3)) { index, track ->
-                                TrackRow(rank = index + 4, track = track)
+                                itemsIndexed(uiState.topTracks.drop(3)) { index, track ->
+                                    TrackRow(rank = index + 4, track = track)
+                                }
                             }
                         }
                     }
