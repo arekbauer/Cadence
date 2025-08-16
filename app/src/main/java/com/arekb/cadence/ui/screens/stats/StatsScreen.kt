@@ -1,5 +1,12 @@
 package com.arekb.cadence.ui.screens.stats
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +55,7 @@ import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,6 +75,7 @@ import coil.compose.AsyncImage
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StatsScreen(
@@ -76,28 +85,29 @@ fun StatsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val lazyListState = rememberLazyListState()
-    var selectedTimeRange by remember { mutableStateOf("short_term") }
-    val timeRanges = mapOf(
-        "4 Weeks" to "short_term",
-        "6 Months" to "medium_term",
-        "12 Months" to "long_term"
-    )
-
     val coroutineScope = rememberCoroutineScope()
     val state = rememberPullToRefreshState()
+
+    // API fetching logic
+    var selectedIndex by remember { mutableIntStateOf(0) }
+    val timeRanges = listOf("short_term", "medium_term", "long_term")
+    val options = listOf("4 Weeks", "6 Months", "12 Months")
+
+
+    // Pull to refresh logic
     var isRefreshing by remember { mutableStateOf(false) }
     val onRefresh: () -> Unit = {
         isRefreshing = true
         coroutineScope.launch {
-            viewModel.onRefresh(selectedTimeRange)
+            viewModel.onRefresh(timeRanges[selectedIndex])
             isRefreshing = false
         }
     }
 
     // This LaunchedEffect will run once initially, and then again whenever
     // the selectedIndex changes, triggering a new data fetch.
-    LaunchedEffect(selectedTimeRange) {
-        viewModel.fetchTopTracks(selectedTimeRange)
+    LaunchedEffect(selectedIndex) {
+        viewModel.fetchTopTracks(timeRanges[selectedIndex])
     }
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
@@ -110,8 +120,8 @@ fun StatsScreen(
             LargeFlexibleTopAppBar(
                 title = { Text("Your Top Tracks", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 subtitle = {
-                    val displayLabel = timeRanges.entries.find { it.value == selectedTimeRange }?.key
-                    Text(text = "Last ${displayLabel?: "Time Length"}", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    val displayLabel = options[selectedIndex]
+                    Text(text = "Last $displayLabel", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -120,11 +130,11 @@ fun StatsScreen(
                 scrollBehavior = scrollBehavior,
             )
         },
-        content = {
+        content = { innerPadding ->
             Box(Modifier.fillMaxSize()
             ) {
                 PullToRefreshBox(
-                    modifier = Modifier.padding(it),
+                    modifier = Modifier.padding(innerPadding),
                     state = state,
                     isRefreshing = isRefreshing,
                     onRefresh = onRefresh,
@@ -136,18 +146,32 @@ fun StatsScreen(
                         )
                     },
                 ) {
+                    AnimatedContent(
+                        targetState = selectedIndex,
+                        label = "PageContentAnimation",
+                        transitionSpec = {
+                            // Compare the new index (targetState) with the old one (initialState)
+                            if (targetState > initialState) {
+                                // If moving forwards, slide in from the right
+                                slideInHorizontally { width -> width } + fadeIn() togetherWith
+                                        slideOutHorizontally { width -> -width } + fadeOut()
+                            } else {
+                                // If moving backwards, slide in from the left
+                                slideInHorizontally { width -> -width } + fadeIn() togetherWith
+                                        slideOutHorizontally { width -> width } + fadeOut()
+                            }
+                        }
+                    ) {
                     when {
                         uiState.isLoading || uiState.topTracks.isEmpty() -> {
                             StatsScreenSkeleton()
                         }
-
                         uiState.error != null -> {
                             Text(
                                 text = uiState.error!!,
                                 modifier = Modifier.align(Alignment.Center)
                             )
                         }
-
                         else -> {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
@@ -190,6 +214,7 @@ fun StatsScreen(
                             }
                         }
                     }
+                    }
                 }
                 HorizontalFloatingToolbar(
                     modifier = Modifier
@@ -198,22 +223,16 @@ fun StatsScreen(
                     expanded = true,
                     scrollBehavior = exitAlwaysScrollBehavior,
                     content = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            timeRanges.forEach { (label, value) ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            options.forEachIndexed { index, label ->
                                 ToggleButton(
                                     shapes = ToggleButtonShapes(
                                         shape = ToggleButtonDefaults.shape,
                                         pressedShape = ToggleButtonDefaults.shape,
                                         checkedShape = ToggleButtonDefaults.shape
                                     ),
-                                    checked = selectedTimeRange == value,
-                                    onCheckedChange = {
-                                        if (it) { // ToggleButton can be unchecked, we only act on check
-                                            selectedTimeRange = value
-                                        }
-                                    }
+                                    checked = selectedIndex == index,
+                                    onCheckedChange = { if (it) { selectedIndex = index } }
                                 ) {
                                     Text(label)
                                 }
@@ -227,7 +246,6 @@ fun StatsScreen(
     )
 }
 
-// TODO: Add animations?
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TopTrackHeroCard(track: TopTracksEntity) {

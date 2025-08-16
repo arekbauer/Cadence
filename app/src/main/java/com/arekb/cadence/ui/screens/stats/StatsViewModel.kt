@@ -22,22 +22,24 @@ class StatsViewModel @Inject constructor(
 
     private var fetchJob: Job? = null
 
+    /**
+     * Called by the UI to fetch top tracks.
+     * @param timeRange The time range to fetch tracks for.
+     */
     fun fetchTopTracks(timeRange: String = "short_term") {
         // Cancel any previous fetch job to avoid running multiple collectors at once.
         fetchJob?.cancel()
 
         fetchJob = viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-
             userRepository.getTopTracks(timeRange = timeRange, limit = 20)
                 .collect { result ->
                     result.fold(
                         onSuccess = { tracks ->
                             _uiState.update {
-                                if (tracks != null) {
-                                    it.copy(isLoading = false, topTracks = tracks)
-                                } else {
+                                if (tracks.isNullOrEmpty()) {
                                     it.copy(isLoading = true)
+                                } else {
+                                    it.copy(isLoading = false, topTracks = tracks)
                                 }
                             }
                         },
@@ -58,8 +60,6 @@ class StatsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             userRepository.forceRefreshTopTracks(timeRange)
-
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 }
