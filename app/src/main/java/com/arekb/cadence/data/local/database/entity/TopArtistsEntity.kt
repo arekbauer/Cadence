@@ -9,6 +9,7 @@ data class TopArtistsEntity(
     val imageUrl: String?,
     val timeRange: String,
     val popularity: Int,
+    val genres: String,
     val rank: Int,
     val lastFetched: Long
 )

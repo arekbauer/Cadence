@@ -92,6 +92,7 @@ class UserRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 val topArtistsDto = response.body()!!
                 val topArtistsEntities = topArtistsDto.items.map { artist ->
+                    val allGenres = artist.genres.joinToString(", ")
                     TopArtistsEntity(
                         id = artist.id,
                         artistName = artist.name,
@@ -99,7 +100,8 @@ class UserRepositoryImpl @Inject constructor(
                         timeRange = timeRange,
                         rank = topArtistsDto.items.indexOf(artist) + 1,
                         lastFetched = System.currentTimeMillis(),
-                        popularity = artist.popularity
+                        popularity = artist.popularity,
+                        genres = allGenres.ifEmpty { "Unknown" }
                     )
                 }
                 artistsDao.clearTopArtists(timeRange)
@@ -159,6 +161,7 @@ class UserRepositoryImpl @Inject constructor(
                 // 2. Map the network response to database entities
                 val topArtistsDto = response.body()!!
                 val topArtistsEntities = topArtistsDto.items.map { artist ->
+                    val allGenres = artist.genres.joinToString(", ")
                     TopArtistsEntity(
                         id = artist.id,
                         artistName = artist.name,
@@ -166,7 +169,8 @@ class UserRepositoryImpl @Inject constructor(
                         timeRange = timeRange,
                         rank = topArtistsDto.items.indexOf(artist) + 1,
                         lastFetched = System.currentTimeMillis(),
-                        popularity = artist.popularity
+                        popularity = artist.popularity,
+                        genres = allGenres.ifEmpty { "Unknown" }
                     )
                 }
                 // 3. Save the new data to the database
