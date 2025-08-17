@@ -1,5 +1,13 @@
 package com.arekb.cadence.ui.screens.stats
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,12 +31,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarDefaults.ScreenOffset
 import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
+import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,13 +49,17 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,29 +71,44 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
+import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StatsScreen(
     viewModel: StatsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val lazyListState = rememberLazyListState()
-    var selectedTimeRange by remember { mutableStateOf("short_term") }
-    val timeRanges = mapOf(
-        "4 Weeks" to "short_term",
-        "6 Months" to "medium_term",
-        "12 Months" to "long_term"
-    )
+    val coroutineScope = rememberCoroutineScope()
+    val state = rememberPullToRefreshState()
+
+    // API fetching logic
+    var selectedIndex by remember { mutableIntStateOf(0) }
+    val timeRanges = listOf("short_term", "medium_term", "long_term")
+    val options = listOf("4 Weeks", "6 Months", "12 Months")
+
+
+    // Pull to refresh logic
+    var isRefreshing by remember { mutableStateOf(false) }
+    val onRefresh: () -> Unit = {
+        isRefreshing = true
+        coroutineScope.launch {
+            viewModel.onRefresh(timeRanges[selectedIndex])
+            isRefreshing = false
+        }
+    }
 
     // This LaunchedEffect will run once initially, and then again whenever
     // the selectedIndex changes, triggering a new data fetch.
-    LaunchedEffect(selectedTimeRange) {
-        viewModel.fetchTopTracks(selectedTimeRange)
+    LaunchedEffect(selectedIndex) {
+        viewModel.fetchTopTracks(timeRanges[selectedIndex])
     }
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
@@ -95,8 +121,8 @@ fun StatsScreen(
             LargeFlexibleTopAppBar(
                 title = { Text("Your Top Tracks", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 subtitle = {
-                    val displayLabel = timeRanges.entries.find { it.value == selectedTimeRange }?.key
-                    Text(text = "Last ${displayLabel?: "Time Length"}", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    val displayLabel = options[selectedIndex]
+                    Text(text = "Last $displayLabel", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -108,91 +134,140 @@ fun StatsScreen(
         content = { innerPadding ->
             Box(Modifier.fillMaxSize()
             ) {
-                when {
-                    uiState.isLoading -> {
-                        //TODO: Create skeletons of page instead of showing loading animation
-                        CircularWavyProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                    }
-                    uiState.error != null -> {
-                        Text(text = uiState.error!!, modifier = Modifier.align(Alignment.Center))
-                    }
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            state = lazyListState,
-                            contentPadding = PaddingValues(
-                                top = innerPadding.calculateTopPadding(),
-                                start = 16.dp,
-                                end = 16.dp,
-                                bottom = 16.dp
+                PullToRefreshBox(
+                    modifier = Modifier.padding(innerPadding),
+                    state = state,
+                    isRefreshing = isRefreshing,
+                    onRefresh = onRefresh,
+                    indicator = {
+                        PullToRefreshDefaults.LoadingIndicator(
+                            state = state,
+                            isRefreshing = isRefreshing,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                        )
+                    },
+                ) {
+                    AnimatedContent(
+                        targetState = selectedIndex,
+                        label = "PageContentAnimation",
+                        transitionSpec = {
+                            val forward = targetState > initialState
+
+                            val enterTransition = slideInHorizontally { width ->
+                                if (forward) width else -width
+                            } + fadeIn()
+
+                            val exitTransition = slideOutHorizontally { width ->
+                                if (forward) -width else width
+                            } + fadeOut()
+
+                            enterTransition.togetherWith(exitTransition).using(
+                                SizeTransform(clip = true)
                             )
-                        ) {
-                            if (uiState.topTracks.isNotEmpty()) {
-                                item {
-                                    TopTrackHeroCard(track = uiState.topTracks.first())
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                }
-                                item{
-                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
-                                    {
-                                        ThreeTwoCard(
-                                            track = uiState.topTracks[1],
-                                            shape = MaterialShapes.Cookie7Sided.toShape(),
-                                            Modifier.weight(1f)
-                                        )
-                                        Spacer(modifier = Modifier.width(16.dp))
-                                        ThreeTwoCard(
-                                            track = uiState.topTracks[2],
-                                            MaterialShapes.Sunny.toShape(),
-                                            Modifier.weight(1f)
-                                        )
+                        }
+                    ) {
+                    when {
+                        uiState.isLoading || uiState.topTracks.isEmpty() -> {
+                            StatsScreenSkeleton()
+                        }
+                        uiState.error != null -> {
+                            Text(
+                                text = uiState.error!!,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        }
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                state = lazyListState,
+                                contentPadding = PaddingValues(
+                                    top = 4.dp,
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                )
+                            ) {
+                                if (uiState.topTracks.isNotEmpty()) {
+                                    item {
+                                        TopTrackHeroCard(track = uiState.topTracks.first())
+                                        Spacer(modifier = Modifier.height(16.dp))
                                     }
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    item {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        )
+                                        {
+                                            ThreeTwoCard(
+                                                track = uiState.topTracks[1],
+                                                shape = MaterialShapes.Cookie7Sided.toShape(),
+                                                Modifier.weight(1f)
+                                            )
+                                            Spacer(modifier = Modifier.width(16.dp))
+                                            ThreeTwoCard(
+                                                track = uiState.topTracks[2],
+                                                MaterialShapes.Sunny.toShape(),
+                                                Modifier.weight(1f)
+                                            )
+                                        }
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                    }
                                 }
-                            }
-                            itemsIndexed(uiState.topTracks.drop(3)) { index, track ->
-                                TrackRow(rank = index + 4, track = track)
+                                itemsIndexed(uiState.topTracks.drop(3)) { index, track ->
+                                    TrackRow(rank = index + 4, track = track)
+                                }
                             }
                         }
+                    }
                     }
                 }
-                HorizontalFloatingToolbar(
+                StatsTimeRangeToolbar(
+                    selectedIndex = selectedIndex,
+                    onSelectionChanged = { newIndex -> selectedIndex = newIndex },
+                    scrollBehavior = exitAlwaysScrollBehavior,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .offset(y = -ScreenOffset - 16.dp),
-                    expanded = true,
-                    scrollBehavior = exitAlwaysScrollBehavior,
-                    content = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            timeRanges.forEach { (label, value) ->
-                                ToggleButton(
-                                    shapes = ToggleButtonShapes(
-                                        shape = ToggleButtonDefaults.shape,
-                                        pressedShape = ToggleButtonDefaults.shape,
-                                        checkedShape = ToggleButtonDefaults.shape
-                                    ),
-                                    checked = selectedTimeRange == value,
-                                    onCheckedChange = {
-                                        if (it) { // ToggleButton can be unchecked, we only act on check
-                                            selectedTimeRange = value
-                                        }
-                                    }
-                                ) {
-                                    Text(label)
-                                }
-                            }
-                        }
-                    }
+                        .offset(y = -FloatingToolbarDefaults.ScreenOffset - 16.dp)
                 )
-
             }
         }
     )
 }
 
-// TODO: Add animations?
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun StatsTimeRangeToolbar(
+    selectedIndex: Int,
+    onSelectionChanged: (Int) -> Unit,
+    scrollBehavior: FloatingToolbarScrollBehavior,
+    modifier: Modifier = Modifier
+) {
+    val options = listOf("4 Weeks", "6 Months", "12 Months")
+
+    HorizontalFloatingToolbar(
+        modifier = modifier,
+        expanded = true,
+        scrollBehavior = scrollBehavior,
+        content = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                options.forEachIndexed { index, label ->
+                    ToggleButton(
+                        shapes = ToggleButtonShapes(
+                            shape = ToggleButtonDefaults.shape,
+                            pressedShape = ToggleButtonDefaults.shape,
+                            checkedShape = ToggleButtonDefaults.shape
+                        ),
+                        checked = selectedIndex == index,
+                        onCheckedChange = { if (it) onSelectionChanged(index) }
+                    ) {
+                        Text(label)
+                    }
+                }
+            }
+        }
+    )
+}
+
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TopTrackHeroCard(track: TopTracksEntity) {
@@ -211,7 +286,7 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             // --- Text Content ---
-            Column(modifier = Modifier.padding(8.dp).weight(1f),
+            Column(modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
@@ -234,7 +309,7 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
 
                 Text(
                     text = track.trackName,
-                    style = MaterialTheme.typography.headlineMediumEmphasized,
+                    style = MaterialTheme.typography.titleLargeEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -249,7 +324,7 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
                     textAlign = TextAlign.Center
                 )
             }
-            Spacer(modifier = Modifier.width(64.dp))
+            Spacer(modifier = Modifier.width(32.dp))
             // --- Album Art ---
             AsyncImage(
                 model = track.imageUrl,
@@ -289,7 +364,7 @@ fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = track.trackName,
-                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    style = MaterialTheme.typography.titleSmallEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
