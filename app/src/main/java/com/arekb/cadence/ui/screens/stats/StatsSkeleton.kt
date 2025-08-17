@@ -81,7 +81,7 @@ fun TopTrackHeroCardSkeleton() {
 @Composable
 fun ThreeTwoCardSkeleton(modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.height(245.dp)
+        modifier = modifier.height(225.dp)
             .clip(RoundedCornerShape(24.dp))
             .shimmer(),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),

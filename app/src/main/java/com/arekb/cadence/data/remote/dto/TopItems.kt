@@ -3,11 +3,19 @@ package com.arekb.cadence.data.remote.dto
 import com.google.gson.annotations.SerializedName
 
 /**
- * Represents the top-level response from the /top/tracks and /top/artists endpoints.
+ * Represents the top-level response from the /top/tracks endpoints.
  */
 data class TopItemsResponse(
     @SerializedName("items")
     val items: List<TrackObject>
+)
+
+/**
+ * Represents the top-level response from the /top/artists endpoints.
+ */
+data class TopArtistResponse(
+    @SerializedName("items")
+    val items: List<TopArtistObject>
 )
 
 /**
@@ -26,6 +34,20 @@ data class TrackObject(
 
     @SerializedName("album")
     val album: AlbumObject
+)
+
+/**
+ * Represents a top artist object.
+ */
+data class TopArtistObject(
+    @SerializedName("id")
+    val id: String,
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("images")
+    val images: List<ImageObject>,
+    @SerializedName("popularity")
+    val popularity: Int
 )
 
 /**

@@ -31,4 +31,7 @@ object DatabaseModule {
     @Provides
     fun provideTopTracksDao(database: AppDatabase) = database.topTracksDao()
 
+    @Provides
+    fun provideTopArtistsDao(database: AppDatabase) = database.topArtistsDao()
+
 }
