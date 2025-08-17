@@ -1,5 +1,6 @@
 package com.arekb.cadence.data.remote.api
 
+import com.arekb.cadence.data.remote.dto.TopArtistResponse
 import com.arekb.cadence.data.remote.dto.TopItemsResponse
 import com.arekb.cadence.data.remote.dto.UserProfile
 import retrofit2.Response
@@ -24,4 +25,15 @@ interface SpotifyApiService {
         @Query("time_range") timeRange: String,
         @Query("limit") limit: Int
     ): Response<TopItemsResponse>
+
+    /**
+     * Fetches the user's top artists.
+     * @param timeRange Over what time frame the data is calculated. Valid values: long_term, medium_term, short_term.
+     * @param limit The number of items to return. Default: 20. Max: 50.
+     */
+    @GET("v1/me/top/artists")
+    suspend fun getTopArtists(
+        @Query("time_range") timeRange: String,
+        @Query("limit") limit: Int
+    ): Response<TopArtistResponse>
 }

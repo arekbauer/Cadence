@@ -13,7 +13,8 @@ import com.arekb.cadence.ui.screens.home.HomeViewEvent
 import com.arekb.cadence.ui.screens.home.HomeViewModel
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
-import com.arekb.cadence.ui.screens.stats.StatsScreen
+import com.arekb.cadence.ui.screens.stats.artists.TopArtistsScreen
+import com.arekb.cadence.ui.screens.stats.tracks.TopTracksScreen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,13 +69,23 @@ fun AppNavigation(
         composable("home") {
             HomeScreen(
                 viewModel = homeViewModel,
-                onNavigateToStats = {
-                    navController.navigate("stats")
+                onNavigateToMyTopTracks = {
+                    navController.navigate("top_tracks")
+                },
+                onNavigateToMyTopArtists = {
+                    navController.navigate("top_artists")
                 }
             )
         }
-        composable("stats") {
-            StatsScreen(
+        composable("top_tracks") {
+            TopTracksScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+        composable("top_artists"){
+            TopArtistsScreen(
                 onNavigateBack = {
                     navController.navigateUp()
                 }

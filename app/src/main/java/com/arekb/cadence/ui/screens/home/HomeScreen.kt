@@ -29,7 +29,8 @@ import coil.compose.AsyncImage
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToStats: () -> Unit
+    onNavigateToMyTopTracks: () -> Unit,
+    onNavigateToMyTopArtists: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -72,8 +73,11 @@ fun HomeScreen(
                     Text(text = "Welcome back", style = MaterialTheme.typography.headlineLarge)
                     Text(text = user?.displayName ?: "Default", style = MaterialTheme.typography.headlineLarge)
 
-                    Button(onClick = onNavigateToStats) {
+                    Button(onClick = onNavigateToMyTopTracks) {
                         Text("View My Top Tracks")
+                    }
+                    Button(onClick = onNavigateToMyTopArtists) {
+                        Text("View My Top Artists")
                     }
                 }
             }

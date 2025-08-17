@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.stats
+package com.arekb.cadence.ui.screens.stats.artists
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
@@ -35,8 +35,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
-import androidx.compose.material3.FloatingToolbarScrollBehavior
-import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -45,9 +43,6 @@ import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
-import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -67,20 +62,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.arekb.cadence.data.local.database.entity.TopTracksEntity
+import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
+import com.arekb.cadence.ui.screens.stats.StatsScreenSkeleton
+import com.arekb.cadence.ui.screens.stats.tracks.StatsTimeRangeToolbar
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun StatsScreen(
-    viewModel: StatsViewModel = hiltViewModel(),
+fun TopArtistsScreen(
+    viewModel: ArtistsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -108,7 +104,7 @@ fun StatsScreen(
     // This LaunchedEffect will run once initially, and then again whenever
     // the selectedIndex changes, triggering a new data fetch.
     LaunchedEffect(selectedIndex) {
-        viewModel.fetchTopTracks(timeRanges[selectedIndex])
+        viewModel.fetchTopArtists(timeRanges[selectedIndex])
     }
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
@@ -119,7 +115,7 @@ fun StatsScreen(
             .nestedScroll(exitAlwaysScrollBehavior),
         topBar = {
             LargeFlexibleTopAppBar(
-                title = { Text("Your Top Tracks", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text("Your Top Artists", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 subtitle = {
                     val displayLabel = options[selectedIndex]
                     Text(text = "Last $displayLabel", maxLines = 1, overflow = TextOverflow.Ellipsis) },
@@ -167,7 +163,7 @@ fun StatsScreen(
                         }
                     ) {
                     when {
-                        uiState.isLoading || uiState.topTracks.isEmpty() -> {
+                        uiState.isLoading || uiState.topArtists.isEmpty() -> {
                             StatsScreenSkeleton()
                         }
                         uiState.error != null -> {
@@ -186,9 +182,9 @@ fun StatsScreen(
                                     end = 16.dp,
                                 )
                             ) {
-                                if (uiState.topTracks.isNotEmpty()) {
+                                if (uiState.topArtists.isNotEmpty()) {
                                     item {
-                                        TopTrackHeroCard(track = uiState.topTracks.first())
+                                        TopArtistHeroCard(artist = uiState.topArtists.first())
                                         Spacer(modifier = Modifier.height(16.dp))
                                     }
                                     item {
@@ -197,14 +193,14 @@ fun StatsScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         )
                                         {
-                                            ThreeTwoCard(
-                                                track = uiState.topTracks[1],
+                                            ThreeTwoCardArtist(
+                                                artist = uiState.topArtists[1],
                                                 shape = MaterialShapes.Cookie7Sided.toShape(),
                                                 Modifier.weight(1f)
                                             )
                                             Spacer(modifier = Modifier.width(16.dp))
-                                            ThreeTwoCard(
-                                                track = uiState.topTracks[2],
+                                            ThreeTwoCardArtist(
+                                                artist = uiState.topArtists[2],
                                                 MaterialShapes.Sunny.toShape(),
                                                 Modifier.weight(1f)
                                             )
@@ -212,8 +208,8 @@ fun StatsScreen(
                                         Spacer(modifier = Modifier.height(8.dp))
                                     }
                                 }
-                                itemsIndexed(uiState.topTracks.drop(3)) { index, track ->
-                                    TrackRow(rank = index + 4, track = track)
+                                itemsIndexed(uiState.topArtists.drop(3)) { index, artist ->
+                                    ArtistRow(rank = index + 4, artist = artist)
                                 }
                             }
                         }
@@ -235,42 +231,7 @@ fun StatsScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun StatsTimeRangeToolbar(
-    selectedIndex: Int,
-    onSelectionChanged: (Int) -> Unit,
-    scrollBehavior: FloatingToolbarScrollBehavior,
-    modifier: Modifier = Modifier
-) {
-    val options = listOf("4 Weeks", "6 Months", "12 Months")
-
-    HorizontalFloatingToolbar(
-        modifier = modifier,
-        expanded = true,
-        scrollBehavior = scrollBehavior,
-        content = {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                options.forEachIndexed { index, label ->
-                    ToggleButton(
-                        shapes = ToggleButtonShapes(
-                            shape = ToggleButtonDefaults.shape,
-                            pressedShape = ToggleButtonDefaults.shape,
-                            checkedShape = ToggleButtonDefaults.shape
-                        ),
-                        checked = selectedIndex == index,
-                        onCheckedChange = { if (it) onSelectionChanged(index) }
-                    ) {
-                        Text(label)
-                    }
-                }
-            }
-        }
-    )
-}
-
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun TopTrackHeroCard(track: TopTracksEntity) {
+fun TopArtistHeroCard(artist: TopArtistsEntity) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -300,7 +261,7 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
                 ) {
                     // Rank 1
                     Text(
-                        text = track.rank.toString(),
+                        text = artist.rank.toString(),
                         style = MaterialTheme.typography.headlineLargeEmphasized,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
@@ -308,27 +269,18 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = track.trackName,
+                    text = artist.artistName,
                     style = MaterialTheme.typography.titleLargeEmphasized,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = track.artistNames,
-                    style = MaterialTheme.typography.labelMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
             }
             Spacer(modifier = Modifier.width(32.dp))
             // --- Album Art ---
             AsyncImage(
-                model = track.imageUrl,
-                contentDescription = "Album art for ${track.trackName}",
+                model = artist.imageUrl,
+                contentDescription = "Album art for ${artist.artistName}",
                 modifier = Modifier
                     .padding(8.dp)
                     .size(130.dp)
@@ -340,65 +292,58 @@ fun TopTrackHeroCard(track: TopTracksEntity) {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ThreeTwoCard(track: TopTracksEntity, shape: Shape, modifier: Modifier) {
+fun ThreeTwoCardArtist(artist: TopArtistsEntity, shape: Shape, modifier: Modifier) {
 
-        // 2nd and 3rd Track
-        Card(
-            modifier = modifier,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            ),
-            shape = RoundedCornerShape(24.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally)
-            {
-                AsyncImage(
-                    model = track.imageUrl,
-                    contentDescription = "Album art for ${track.trackName}",
-                    modifier = Modifier
-                        .size(125.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = track.trackName,
-                    style = MaterialTheme.typography.titleSmallEmphasized,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = track.artistNames,
-                    style = MaterialTheme.typography.labelMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+    // 2nd and 3rd Track
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        ),
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally)
+        {
+            AsyncImage(
+                model = artist.imageUrl,
+                contentDescription = "Album art for ${artist.artistName}",
+                modifier = Modifier
+                    .size(125.dp)
+                    .clip(RoundedCornerShape(8.dp))
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = artist.artistName,
+                style = MaterialTheme.typography.titleSmallEmphasized,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
 
-                Box(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(40.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            shape = shape
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = track.rank.toString(),
-                        style = MaterialTheme.typography.titleLargeEmphasized,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                }
+            Box(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(40.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        shape = shape
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = artist.rank.toString(),
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
             }
         }
+    }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun TrackRow(rank: Int, track: TopTracksEntity) {
+fun ArtistRow(rank: Int, artist: TopArtistsEntity) {
     ListItem(
         modifier = Modifier
             .fillMaxWidth()
@@ -416,17 +361,9 @@ fun TrackRow(rank: Int, track: TopTracksEntity) {
         // --- Headline Content: The Track Name ---
         headlineContent = {
             Text(
-                text = track.trackName,
+                text = artist.artistName,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1
-            )
-        },
-        // --- Supporting Content: The Artist Names ---
-        supportingContent = {
-            Text(
-                text = track.artistNames,
-                maxLines = 1,
-                style = MaterialTheme.typography.bodyMedium
             )
         },
         // --- Trailing Content: The Album Art ---
@@ -436,8 +373,8 @@ fun TrackRow(rank: Int, track: TopTracksEntity) {
                 shape = RoundedCornerShape(8.dp)
             ) {
                 AsyncImage(
-                    model = track.imageUrl,
-                    contentDescription = "Album art for ${track.trackName}",
+                    model = artist.imageUrl,
+                    contentDescription = "Album art for ${artist.artistName}",
                 )
             }
         }
