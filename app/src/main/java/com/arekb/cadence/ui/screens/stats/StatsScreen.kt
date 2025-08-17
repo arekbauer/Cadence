@@ -2,6 +2,7 @@ package com.arekb.cadence.ui.screens.stats
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -33,8 +34,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarDefaults.ScreenOffset
 import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
+import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -150,16 +151,19 @@ fun StatsScreen(
                         targetState = selectedIndex,
                         label = "PageContentAnimation",
                         transitionSpec = {
-                            // Compare the new index (targetState) with the old one (initialState)
-                            if (targetState > initialState) {
-                                // If moving forwards, slide in from the right
-                                slideInHorizontally { width -> width } + fadeIn() togetherWith
-                                        slideOutHorizontally { width -> -width } + fadeOut()
-                            } else {
-                                // If moving backwards, slide in from the left
-                                slideInHorizontally { width -> -width } + fadeIn() togetherWith
-                                        slideOutHorizontally { width -> width } + fadeOut()
-                            }
+                            val forward = targetState > initialState
+
+                            val enterTransition = slideInHorizontally { width ->
+                                if (forward) width else -width
+                            } + fadeIn()
+
+                            val exitTransition = slideOutHorizontally { width ->
+                                if (forward) -width else width
+                            } + fadeOut()
+
+                            enterTransition.togetherWith(exitTransition).using(
+                                SizeTransform(clip = true)
+                            )
                         }
                     ) {
                     when {
@@ -216,35 +220,53 @@ fun StatsScreen(
                     }
                     }
                 }
-                HorizontalFloatingToolbar(
+                StatsTimeRangeToolbar(
+                    selectedIndex = selectedIndex,
+                    onSelectionChanged = { newIndex -> selectedIndex = newIndex },
+                    scrollBehavior = exitAlwaysScrollBehavior,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .offset(y = -ScreenOffset - 16.dp),
-                    expanded = true,
-                    scrollBehavior = exitAlwaysScrollBehavior,
-                    content = {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            options.forEachIndexed { index, label ->
-                                ToggleButton(
-                                    shapes = ToggleButtonShapes(
-                                        shape = ToggleButtonDefaults.shape,
-                                        pressedShape = ToggleButtonDefaults.shape,
-                                        checkedShape = ToggleButtonDefaults.shape
-                                    ),
-                                    checked = selectedIndex == index,
-                                    onCheckedChange = { if (it) { selectedIndex = index } }
-                                ) {
-                                    Text(label)
-                                }
-                            }
-                        }
-                    }
+                        .offset(y = -FloatingToolbarDefaults.ScreenOffset - 16.dp)
                 )
-
             }
         }
     )
 }
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun StatsTimeRangeToolbar(
+    selectedIndex: Int,
+    onSelectionChanged: (Int) -> Unit,
+    scrollBehavior: FloatingToolbarScrollBehavior,
+    modifier: Modifier = Modifier
+) {
+    val options = listOf("4 Weeks", "6 Months", "12 Months")
+
+    HorizontalFloatingToolbar(
+        modifier = modifier,
+        expanded = true,
+        scrollBehavior = scrollBehavior,
+        content = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                options.forEachIndexed { index, label ->
+                    ToggleButton(
+                        shapes = ToggleButtonShapes(
+                            shape = ToggleButtonDefaults.shape,
+                            pressedShape = ToggleButtonDefaults.shape,
+                            checkedShape = ToggleButtonDefaults.shape
+                        ),
+                        checked = selectedIndex == index,
+                        onCheckedChange = { if (it) onSelectionChanged(index) }
+                    ) {
+                        Text(label)
+                    }
+                }
+            }
+        }
+    )
+}
+
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
