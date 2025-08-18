@@ -13,16 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="VinylTrackDisplayPreview - Vinyl Display">
+      <SelectionState runConfigName="GenreBarChartPreview - Genre Bar Chart">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TopTrackTrophyCardPreview - #1 Trophy Card">
+      <SelectionState runConfigName="GenreColumnChartPreview - Genre Column Chart">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TopPlayedTrackPreview">
+      <SelectionState runConfigName="SonicProfileCardPreview - Sonic Profile Card">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="OpticalSizingBlackWeightPreview">
+      <SelectionState runConfigName="SonicProfileRadarChartPreview - Sonic Profile Radar Chart">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="SonicProfileRadarChartPreview - Minimal Sonic Profile Radar Chart">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
