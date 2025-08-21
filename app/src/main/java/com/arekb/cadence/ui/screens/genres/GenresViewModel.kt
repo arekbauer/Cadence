@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.analytics
+package com.arekb.cadence.ui.screens.genres
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class AnalyticsViewModel @Inject constructor(
+class GenresViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
 

@@ -13,19 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="GenreBarChartPreview - Genre Bar Chart">
+      <SelectionState runConfigName="GenreDeepDiveScreenPreview - Genre Deep Dive">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="GenreColumnChartPreview - Genre Column Chart">
+      <SelectionState runConfigName="GenreDeepDiveScreenVerticalPreview - Genre Deep Dive (Vertical)">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SonicProfileCardPreview - Sonic Profile Card">
+      <SelectionState runConfigName="GenreConstellationScreenPreview - Genre Constellation">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SonicProfileRadarChartPreview - Sonic Profile Radar Chart">
+      <SelectionState runConfigName="SnappingGenreChartScreenPreview - Snapping Genre Chart">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SonicProfileRadarChartPreview - Minimal Sonic Profile Radar Chart">
+      <SelectionState runConfigName="SnappingGenreChartScreenPreview - Snapping Carousel Genre Chart">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

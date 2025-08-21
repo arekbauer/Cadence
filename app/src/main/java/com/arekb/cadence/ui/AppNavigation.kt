@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.arekb.cadence.data.repository.AuthRepository
-import com.arekb.cadence.ui.screens.analytics.AnalyticsScreen
+import com.arekb.cadence.ui.screens.genres.GenresScreen
 import com.arekb.cadence.ui.screens.home.HomeScreen
 import com.arekb.cadence.ui.screens.home.HomeViewEvent
 import com.arekb.cadence.ui.screens.home.HomeViewModel
@@ -96,7 +96,7 @@ fun AppNavigation(
             )
         }
         composable("analytics"){
-            AnalyticsScreen(
+            GenresScreen(
                 onNavigateBack = {
                     navController.navigateUp()
                 }

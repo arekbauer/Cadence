@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.analytics
+package com.arekb.cadence.ui.screens.genres
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -42,8 +42,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun AnalyticsScreen(
-    viewModel: AnalyticsViewModel = hiltViewModel(),
+fun GenresScreen(
+    viewModel: GenresViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -51,7 +51,7 @@ fun AnalyticsScreen(
     Scaffold(
         topBar = {
             MediumFlexibleTopAppBar(
-                title = { Text("Your Listening Profile") },
+                title = { Text("Your Top Genres") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
