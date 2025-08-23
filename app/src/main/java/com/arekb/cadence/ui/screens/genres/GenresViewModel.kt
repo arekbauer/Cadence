@@ -28,17 +28,25 @@ class GenresViewModel @Inject constructor(
                             // If the cache is empty, stay in the loading state.
                             AnalyticsUiState(isLoading = true)
                         } else {
-                            val rankedGenres = artists
-                                .flatMap { it.genres.split(", ") }
-                                // Filter out any blank or "unknown" genres
-                                .filter { it.isNotBlank() && it != "Unknown" }
-                                .groupingBy { it }
-                                .eachCount()
-                                // Convert the map to a list of pairs
-                                .toList()
-                                .sortedByDescending { it.second }
+                            val genreToArtistsMap = mutableMapOf<String, MutableList<Artist>>()
 
-                            AnalyticsUiState(isLoading = false, topGenres = rankedGenres)
+                            artists.forEach { artistEntity ->
+                                val genres = artistEntity.genres.split(", ").filter { it.isNotBlank() && it != "Unknown" }
+                                genres.forEach { genre ->
+                                    val artist = Artist(name = artistEntity.artistName, imageUrl = artistEntity.imageUrl)
+                                    genreToArtistsMap.getOrPut(genre) { mutableListOf() }.add(artist)
+                                }
+                            }
+
+                            val rankedGenres = genreToArtistsMap.map { (genreName, artistList) ->
+                                GenreWithArtists(
+                                    name = genreName,
+                                    count = artistList.size,
+                                    artists = artistList
+                                )
+                            }.sortedByDescending { it.count }
+
+                            AnalyticsUiState(isLoading = false, topGenresWithArtists = rankedGenres)
                         }
                     },
                     onFailure = {
@@ -56,11 +64,22 @@ class GenresViewModel @Inject constructor(
 /**
  * The UI state for the Analytics screen.
  * @param isLoading True if the initial data is being loaded.
- * @param topGenres A ranked list of genre names and their counts.
+ * @param topGenresWithArtists A list of genres with their corresponding artists.
  * @param error An error message if something went wrong.
  */
 data class AnalyticsUiState(
     val isLoading: Boolean = true,
-    val topGenres: List<Pair<String, Int>> = emptyList(),
+    val topGenresWithArtists: List<GenreWithArtists> = emptyList(),
     val error: String? = null
+)
+
+data class Artist(
+    val name: String,
+    val imageUrl: String?
+)
+
+data class GenreWithArtists(
+    val name: String,
+    val count: Int,
+    val artists: List<Artist>
 )

@@ -2,6 +2,15 @@
 
 Cadence is a modern Android application built to explore personal Spotify listening statistics and discover new music. This project serves as a practical exercise in building a feature-rich app using the latest Android development technologies, including Jetpack Compose and the official Spotify Android SDK.  
 
+## 📸 Screenshots
+
+Here's a quick preview of the progress so far. The app features a clean, expressive Material 3 design with dynamic animations.  
+
+<p align="center">
+  <img src=".github/assets/top_tracks.png" width="300">
+  &nbsp; &nbsp; &nbsp; &nbsp;
+  <img src=".github/assets/top_artists.png" width="300">
+</p>
 ## ✨ Features
 
 - Secure Spotify Login: Authenticate using the official Spotify Android SDK for a seamless

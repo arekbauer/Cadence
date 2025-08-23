@@ -81,7 +81,7 @@ fun HomeScreen(
                         Text("View My Top Artists")
                     }
                     Button(onClick = onNavigateToAnalytics) {
-                        Text("View Analytics")
+                        Text("View Top Genres")
                     }
                 }
             }
