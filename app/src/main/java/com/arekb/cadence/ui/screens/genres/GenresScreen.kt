@@ -32,7 +32,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularWavyProgressIndicator
-import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
@@ -42,6 +41,7 @@ import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumFlexibleTopAppBar
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
@@ -55,15 +55,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import kotlin.math.pow
 
-const val NUMBER_OF_GENRES = 5
+const val NUMBER_OF_GENRES = 10
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -125,7 +126,8 @@ fun GenresScreen(
                             val horizontalPadding = (this.maxWidth - itemWidth) / 2
 
                             val maxCount = remember(uiState.topGenresWithArtists.take(NUMBER_OF_GENRES)) {
-                                uiState.topGenresWithArtists.maxOfOrNull { it.count }?.toFloat() ?: 1f
+                                // Get the boosted value of the highest count
+                                uiState.topGenresWithArtists.maxOfOrNull { it.count }?.let { it.toFloat().pow(0.75f) } ?: 1f
                             }
 
                             LazyRow(
@@ -141,6 +143,7 @@ fun GenresScreen(
                                         genre = genre,
                                         isHighlighted = index == centerItemIndex,
                                         maxCount = maxCount,
+                                        index = index + 1,
                                         onClick = {
                                             coroutineScope.launch {
                                                 lazyListState.animateScrollToItem(index)
@@ -167,7 +170,6 @@ fun GenresScreen(
     }
 }
 
-//TODO: Not finished - rework completely
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun GenreCarouselItem(
@@ -175,6 +177,7 @@ private fun GenreCarouselItem(
     genre: GenreWithArtists,
     isHighlighted: Boolean,
     maxCount: Float,
+    index: Int,
     onClick: () -> Unit
 ) {
 
@@ -197,59 +200,84 @@ private fun GenreCarouselItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
+        GenreBar(
+            modifier = Modifier.fillMaxWidth(0.8f),
+            count = genre.count,
+            maxCount = maxCount,
+            rank = index,
+            isHighlighted = isHighlighted,
+            onClick = onClick
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun GenreBar(
+    modifier: Modifier = Modifier,
+    count: Int,
+    maxCount: Float,
+    rank: Int,
+    isHighlighted: Boolean,
+    onClick: () -> Unit
+) {
+    val barHeightFraction = ( (count.toFloat().pow(0.75f) / maxCount) * 0.9f )
+        .coerceAtLeast(0.22f)
+
+    Surface(
+        shape = CircleShape,
+        shadowElevation = if (isHighlighted) 8.dp else 2.dp
+    ) {
         Box(
-            modifier = Modifier
-                .clickable(onClick = onClick)
-                .fillMaxWidth(0.8f)
-                .fillMaxHeight((genre.count / maxCount) * 0.85f)
-                .clip(CircleShape)
-                .background(if (isHighlighted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
+            modifier = modifier
+                .fillMaxHeight(barHeightFraction)
+                .background(
+                    if (isHighlighted) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.surfaceVariant
+                )
+                .clickable(onClick = onClick),
             contentAlignment = Alignment.TopCenter
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .fillMaxHeight(0.2f)
-                    .padding(top = 16.dp)
+                    .padding(top = 8.dp)
+                    .size(75.dp)
                     .background(
                         color = MaterialTheme.colorScheme.onPrimary,
-                        shape = MaterialShapes.Flower.toShape()
+                        shape = MaterialShapes.VerySunny.toShape()
                     ),
                 contentAlignment = Alignment.Center,
             ) {
-                // Rank 1
                 Text(
-                    text = "1",
+                    text = rank.toString(),
                     style = MaterialTheme.typography.headlineLargeEmphasized,
-                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = genre.name,
-            style = MaterialTheme.typography.titleLargeEmphasized,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.Normal
-        )
     }
 }
 
-//TODO: Not finished - rework completely
+//TODO: Something is missing - depth, also make scrollable
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArtistList(genre: GenreWithArtists) {
     Column(modifier = Modifier
-        .padding(16.dp)
+        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
         .animateContentSize()) {
-        HorizontalDivider(Modifier, DividerDefaults.Thickness, DividerDefaults.color)
-        Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Artists in ${genre.name}",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
+            text = genre.name,
+            style = MaterialTheme.typography.headlineMediumEmphasized,
+            maxLines = 1,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             genre.artists.forEach { artist ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
