@@ -1,8 +1,12 @@
 package com.arekb.cadence.ui.screens.genres
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -32,7 +36,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -46,11 +49,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -112,7 +118,7 @@ fun GenresScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularWavyProgressIndicator()
+                    GenresScreenSkeleton()
                 }
                 uiState.error != null -> {
                     Text(text = uiState.error!!)
@@ -159,24 +165,38 @@ fun GenresScreen(
                                 }
                             }
                         }
-                        GenreControlRow(
-                            selectedGenre = selectedGenre,
-                            centerItemIndex = centerItemIndex,
-                            genreCount = genres.size,
-                            onPrevious = {
-                                coroutineScope.launch {
-                                    lazyListState.animateScrollToItem((centerItemIndex - 1).coerceAtLeast(0))
+                        ElevatedCard(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer
+                            )
+                        ) {
+                            GenreControlRow(
+                                selectedGenre = selectedGenre,
+                                centerItemIndex = centerItemIndex,
+                                genreCount = genres.size,
+                                onPrevious = {
+                                    coroutineScope.launch {
+                                        lazyListState.animateScrollToItem(
+                                            (centerItemIndex - 1).coerceAtLeast(
+                                                0
+                                            )
+                                        )
+                                    }
+                                },
+                                onNext = {
+                                    coroutineScope.launch {
+                                        lazyListState.animateScrollToItem(
+                                            (centerItemIndex + 1).coerceAtMost(
+                                                genres.lastIndex
+                                            )
+                                        )
+                                    }
                                 }
-                            },
-                            onNext = {
-                                coroutineScope.launch {
-                                    lazyListState.animateScrollToItem((centerItemIndex + 1).coerceAtMost(genres.lastIndex))
-                                }
-                            }
-                        )
+                            )
 
-                        selectedGenre?.let {
-                            ArtistGrid(genre = it)
+                            selectedGenre?.let {
+                                ArtistGrid(genre = it)
+                            }
                         }
                     }
                 }
@@ -220,7 +240,6 @@ private fun GenreControlRow(
     }
 }
 
-//TODO: Finalise animations
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun GenreBarChart(
@@ -313,6 +332,11 @@ private fun GenreBar(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArtistGrid(genre: GenreWithArtists) {
+    var itemsVisible by remember(genre) { mutableStateOf(false) }
+
+    LaunchedEffect(genre) {
+        itemsVisible = true
+    }
     // List of material 3 expressive shapes
     val allShapes = remember {
         listOf(
@@ -327,12 +351,6 @@ fun ArtistGrid(genre: GenreWithArtists) {
     val randomShapes = remember(genre.artists, allShapes) {
         List(genre.artists.size) { allShapes.random() }
     }
-
-    ElevatedCard(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 90.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -340,14 +358,33 @@ fun ArtistGrid(genre: GenreWithArtists) {
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            itemsIndexed(genre.artists, key = { _, artist -> artist.name }) { index, artist ->
+            itemsIndexed(genre.artists,
+                key = { _, artist -> "${genre.name}-${artist.name}" }
+            ) { index, artist ->
+                AnimatedVisibility(
+                    visible = itemsVisible,
+                    enter = fadeIn(
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            // ✨ This is the key to the staggered effect! ✨
+                            delayMillis = index * 50 // Each item waits 50ms longer than the last
+                        )
+                    ) + scaleIn(
+                        initialScale = 0.8f,
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            delayMillis = index * 50
+                        )
+                    )
+                ) {
                 ArtistGridItem(
                     artist = artist,
                     shape = randomShapes[index].toShape(),
                 )
             }
+            }
         }
-    }
+
 }
 
 @Composable
