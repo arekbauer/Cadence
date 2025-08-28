@@ -1,12 +1,8 @@
 package com.arekb.cadence.ui.screens.genres
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -15,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -33,10 +30,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialShapes
@@ -119,6 +118,7 @@ fun GenresScreen(
                     Text(text = uiState.error!!)
                 }
                 else -> {
+                    val genres = uiState.topGenresWithArtists.take(NUMBER_OF_GENRES)
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -159,19 +159,63 @@ fun GenresScreen(
                                 }
                             }
                         }
-                        HorizontalDivider(modifier = Modifier.padding(8.dp))
-                        AnimatedVisibility(
-                            visible = selectedGenre != null,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
-                        ) {
-                            selectedGenre?.let {
-                                ArtistGrid(genre = it)
+                        GenreControlRow(
+                            selectedGenre = selectedGenre,
+                            centerItemIndex = centerItemIndex,
+                            genreCount = genres.size,
+                            onPrevious = {
+                                coroutineScope.launch {
+                                    lazyListState.animateScrollToItem((centerItemIndex - 1).coerceAtLeast(0))
+                                }
+                            },
+                            onNext = {
+                                coroutineScope.launch {
+                                    lazyListState.animateScrollToItem((centerItemIndex + 1).coerceAtMost(genres.lastIndex))
+                                }
                             }
+                        )
+
+                        selectedGenre?.let {
+                            ArtistGrid(genre = it)
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun GenreControlRow(
+    selectedGenre: GenreWithArtists?,
+    centerItemIndex: Int,
+    genreCount: Int,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Previous Button
+        IconButton(onClick = onPrevious, enabled = centerItemIndex > 0) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Genre")
+        }
+
+        Text(
+            text = selectedGenre?.name ?: "Select a Genre",
+            style = MaterialTheme.typography.headlineMediumEmphasized,
+            maxLines = 1,
+            textAlign = TextAlign.Center
+        )
+
+        // Next Button
+        IconButton(onClick = onNext, enabled = centerItemIndex < genreCount - 1 && centerItemIndex != -1) {
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Genre")
         }
     }
 }
@@ -187,15 +231,16 @@ private fun GenreBarChart(
     index: Int,
     onClick: () -> Unit
 ) {
+    val springSpec = spring<Float>(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)
 
     val animatedAlpha by animateFloatAsState(
         targetValue = if (isHighlighted) 1f else 0.5f,
-        animationSpec = tween(300),
+        animationSpec = springSpec, // Changed from tween
         label = "AlphaAnimation"
     )
     val animatedScale by animateFloatAsState(
         targetValue = if (isHighlighted) 1f else 0.9f,
-        animationSpec = tween(300),
+        animationSpec = springSpec, // Changed from tween
         label = "ScaleAnimation"
     )
 
@@ -215,16 +260,7 @@ private fun GenreBarChart(
             isHighlighted = isHighlighted,
             onClick = onClick
         )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = genre.name,
-            style = MaterialTheme.typography.headlineMediumEmphasized,
-            maxLines = 1,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
@@ -238,8 +274,8 @@ private fun GenreBar(
     isHighlighted: Boolean,
     onClick: () -> Unit
 ) {
-    val barHeightFraction = ( (count.toFloat().pow(0.75f) / maxCount) * 0.9f )
-        .coerceAtLeast(0.22f)
+    val barHeightFraction = ( (count.toFloat().pow(0.75f) / maxCount) * 0.85f )
+        .coerceAtLeast(0.24f)
 
     Surface(
         shape = CircleShape,
@@ -292,40 +328,46 @@ fun ArtistGrid(genre: GenreWithArtists) {
         List(genre.artists.size) { allShapes.random() }
     }
 
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 90.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+    ElevatedCard(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
     ) {
-        itemsIndexed(genre.artists) { index, artist ->
-            ArtistGridItem(
-                artist = artist,
-                shape = randomShapes[index].toShape()
-            )
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 90.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        ) {
+            itemsIndexed(genre.artists, key = { _, artist -> artist.name }) { index, artist ->
+                ArtistGridItem(
+                    artist = artist,
+                    shape = randomShapes[index].toShape(),
+                )
+            }
         }
     }
 }
 
 @Composable
 fun ArtistGridItem(artist: Artist, shape: Shape) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        AsyncImage(
-            model = artist.imageUrl,
-            contentDescription = "Image for ${artist.name}",
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(shape)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = artist.name,
-            style = MaterialTheme.typography.labelLarge,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                model = artist.imageUrl,
+                contentDescription = "Image for ${artist.name}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(shape)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = artist.name,
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
 }
