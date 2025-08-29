@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-08-17T22:39:40.059709600Z">
+        <DropdownSelection timestamp="2025-08-28T23:53:21.985087Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\user\.android\avd\Medium_Phone_API_35.avd" />
@@ -13,17 +13,28 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="VinylTrackDisplayPreview - Vinyl Display">
+      <SelectionState runConfigName="GenreConstellationScreenPreview - Genre Constellation">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TopTrackTrophyCardPreview - #1 Trophy Card">
+      <SelectionState runConfigName="SnappingGenreChartScreenPreview - Snapping Genre Chart">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="TopPlayedTrackPreview">
+      <SelectionState runConfigName="SnappingGenreChartScreenPreview - Snapping Carousel Genre Chart">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="OpticalSizingBlackWeightPreview">
+      <SelectionState runConfigName="SnappingGenreCarouselScreenPreview - Snapping Carousel Genre Chart">
         <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="BarObject">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-08-23T01:06:06.347408200Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=27051JEGR21531" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
       </SelectionState>
     </selectionStates>
   </component>

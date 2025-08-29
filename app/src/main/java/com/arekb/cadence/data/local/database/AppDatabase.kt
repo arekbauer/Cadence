@@ -11,7 +11,7 @@ import com.arekb.cadence.data.local.database.entity.UserProfileEntity
 
 @Database(
     entities = [UserProfileEntity::class, TopTracksEntity::class, TopArtistsEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 

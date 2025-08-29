@@ -47,7 +47,9 @@ data class TopArtistObject(
     @SerializedName("images")
     val images: List<ImageObject>,
     @SerializedName("popularity")
-    val popularity: Int
+    val popularity: Int,
+    @SerializedName("genres")
+    val genres: List<String>
 )
 
 /**
