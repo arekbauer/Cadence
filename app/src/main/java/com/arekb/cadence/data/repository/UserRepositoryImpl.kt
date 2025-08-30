@@ -7,6 +7,7 @@ import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
 import com.arekb.cadence.data.remote.api.SpotifyApiService
+import com.arekb.cadence.data.remote.dto.PlayHistoryObject
 import com.arekb.cadence.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.TimeUnit
@@ -179,6 +180,19 @@ class UserRepositoryImpl @Inject constructor(
                 Result.success(Unit)
             } else {
                 Result.failure(Exception("Failed to refresh top artists"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getRecentlyPlayed(): Result<List<PlayHistoryObject>> {
+        return try {
+            val response = api.getRecentlyPlayed(limit = 10)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!.items)
+            } else {
+                Result.failure(Exception("Failed to fetch recently played tracks"))
             }
         } catch (e: Exception) {
             Result.failure(e)

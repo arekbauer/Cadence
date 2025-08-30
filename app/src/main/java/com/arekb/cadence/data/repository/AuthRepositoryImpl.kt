@@ -1,10 +1,10 @@
 package com.arekb.cadence.data.repository
 
+import com.arekb.cadence.BuildConfig
+import com.arekb.cadence.data.local.TokenManager
 import com.arekb.cadence.data.remote.api.SpotifyAuthApiService
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
-import com.arekb.cadence.BuildConfig
-import com.arekb.cadence.data.local.TokenManager
 import java.util.Base64
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,7 +25,8 @@ class AuthRepositoryImpl @Inject constructor(
             REDIRECT_URI
         )
             .setScopes(arrayOf("user-read-private", "user-top-read",
-                "playlist-modify-public", "user-follow-read"))
+                "playlist-modify-public", "user-follow-read",
+                "user-read-recently-played"))
             .build()
     }
 

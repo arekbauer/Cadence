@@ -1,9 +1,9 @@
 package com.arekb.cadence.ui.screens.home
 
-import androidx.datastore.core.IOException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
+import com.arekb.cadence.data.remote.dto.PlayHistoryObject
 import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,7 +29,8 @@ class HomeViewModel @Inject constructor(
     /**
      * Fetches the user profile from the repository and updates the UI state.
      **/
-    fun fetchUserProfile() {
+    fun fetchInitialData() {
+        // Fetch user profile
         viewModelScope.launch {
             userRepository.getProfile()
                 .collect { result ->
@@ -51,12 +51,24 @@ class HomeViewModel @Inject constructor(
                         }
                     )
                 }
+            }
+
+        // Fetch recently played tracks
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val recentlyPlayedResult = userRepository.getRecentlyPlayed()
+            recentlyPlayedResult.onSuccess { tracks ->
+                _uiState.update { it.copy(isLoading = false, recentlyPlayed = tracks) }
+            }.onFailure {
+                _uiState.update { it.copy(isLoading = false, error = "Failed to load recent tracks.") }
+            }
         }
     }
 
     data class HomeUiState(
         val isLoading: Boolean = true,
         val userProfile: UserProfileEntity? = null,
+        val recentlyPlayed: List<PlayHistoryObject> = emptyList(),
         val error: String? = null
     )
 }

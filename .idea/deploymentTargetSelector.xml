@@ -13,28 +13,17 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="GenreConstellationScreenPreview - Genre Constellation">
+      <SelectionState runConfigName="HomeScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SnappingGenreChartScreenPreview - Snapping Genre Chart">
+      <SelectionState runConfigName="ExpressiveHomeScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SnappingGenreChartScreenPreview - Snapping Carousel Genre Chart">
+      <SelectionState runConfigName="ImmersiveHomeScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="SnappingGenreCarouselScreenPreview - Snapping Carousel Genre Chart">
+      <SelectionState runConfigName="SoundscapeHomeScreenPreview">
         <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="BarObject">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-08-23T01:06:06.347408200Z">
-          <Target type="DEFAULT_BOOT">
-            <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=27051JEGR21531" />
-            </handle>
-          </Target>
-        </DropdownSelection>
-        <DialogSelection />
       </SelectionState>
     </selectionStates>
   </component>
