@@ -76,7 +76,7 @@ fun AppNavigation(
                 onNavigateToMyTopArtists = {
                     navController.navigate("top_artists")
                 },
-                onNavigateToAnalytics = {
+                onNavigateToTopGenres = {
                     navController.navigate("analytics")
                 }
             )
