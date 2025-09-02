@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +22,6 @@ import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -97,12 +97,12 @@ fun HomeScreen(
                         item {
                             Text(
                                 text = "Welcome Back",
-                                style = MaterialTheme.typography.displayMediumEmphasized,
+                                style = MaterialTheme.typography.headlineMediumEmphasized,
                                 modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
                             )
                             Text(
                                 text = uiState.userProfile!!.displayName,
-                                style = MaterialTheme.typography.displayMediumEmphasized,
+                                style = MaterialTheme.typography.headlineSmallEmphasized,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -122,20 +122,6 @@ fun HomeScreen(
                                 onNavigateToTopGenres = onNavigateToTopGenres
                             )
                         }
-                        // Temporary old buttons
-                        item {
-                            Spacer(modifier = Modifier.height(900.dp))
-                            Text(text = "HomeScreenTemp")
-                            Button(onClick = onNavigateToMyTopTracks) {
-                                Text("View My Top Tracks")
-                            }
-                            Button(onClick = onNavigateToMyTopArtists) {
-                                Text("View My Top Artists")
-                            }
-                            Button(onClick = onNavigateToTopGenres) {
-                                Text("View Top Genres")
-                            }
-                        }
                     }
                 }
             }
@@ -152,10 +138,9 @@ fun AnalyticsHubCard(
     onNavigateToTopArtists: () -> Unit,
     onNavigateToTopGenres: () -> Unit,
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(
             modifier = Modifier
@@ -254,7 +239,7 @@ private fun AnalyticsNavButton(
     }
 }
 
-// TODO: Very generic for now, needs tweaking
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LastPlayedSongCard(
@@ -264,71 +249,67 @@ fun LastPlayedSongCard(
     ElevatedCard(
         modifier = modifier.fillMaxWidth().padding(16.dp),
         shape = RoundedCornerShape(24.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        )
     ) {
         Box(modifier = Modifier
             .fillMaxWidth()
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.tertiaryContainer
-                    )
-                )
-            )
         ) {
             Row(
                 modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // --- Album Art ---
+                // Album Art
                 AsyncImage(
                     model = item.track.album.images.firstOrNull()?.url,
                     contentDescription = "Album art for ${item.track.name}",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(100.dp)
-                        .clip(MaterialShapes.VerySunny.toShape()),
-                    contentScale = ContentScale.Crop
+                        .size(68.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
 
-                // --- Text Details ---
+                Spacer(Modifier.width(16.dp))
+
+                // Text content with clear hierarchy
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = "Last Played",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(Modifier.height(4.dp))
                     Text(
                         text = item.track.name,
-                        style = MaterialTheme.typography.titleLargeEmphasized,
+                        style = MaterialTheme.typography.titleMediumEmphasized,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = item.track.artists.joinToString(", ") { it.name },
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
-            }
 
-            // Spotify Logo
-            Icon(
-                painter = painterResource(R.drawable.spotify_small_logo_black),
-                contentDescription = "Powered by Spotify",
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-                    .size(30.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+                Spacer(Modifier.width(16.dp))
+
+                // Spotify Logo
+                Icon(
+                    painter = painterResource(id = R.drawable.spotify_small_logo_black), // Replace with your drawable
+                    contentDescription = "Spotify Logo",
+                    modifier = Modifier.size(28.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }
-
