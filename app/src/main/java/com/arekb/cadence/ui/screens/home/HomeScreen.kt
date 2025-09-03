@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -41,15 +42,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.arekb.cadence.R
 import com.arekb.cadence.data.remote.dto.PlayHistoryObject
 
@@ -64,7 +69,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.fetchInitialData()
+        viewModel.loadHomeScreenData()
     }
 
     Scaffold { innerPadding ->
@@ -82,7 +87,7 @@ fun HomeScreen(
                 uiState.error != null -> {
                     Column {
                         Text(text = "Error loading profile: " + uiState.error!!)
-                        Button(onClick = { viewModel.fetchInitialData() }) {
+                        Button(onClick = { viewModel.loadHomeScreenData() }) {
                             Text("Retry")
                         }
                     }
@@ -95,19 +100,12 @@ fun HomeScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
-                            Text(
-                                text = "Welcome Back",
-                                style = MaterialTheme.typography.headlineMediumEmphasized,
-                                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                            )
-                            Text(
-                                text = uiState.userProfile!!.displayName,
-                                style = MaterialTheme.typography.headlineSmallEmphasized,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            WelcomeRow(
+                                displayName = uiState.userProfile!!.displayName,
+                                avatarUrl = uiState.userProfile!!.imageUrl,
                             )
                         }
                         item {
-                            Spacer(modifier = Modifier.height(16.dp))
                             if (uiState.recentlyPlayed.isNotEmpty()) {
                                 LastPlayedSongCard(item = uiState.recentlyPlayed.first())
                             } else {
@@ -122,10 +120,67 @@ fun HomeScreen(
                                 onNavigateToTopGenres = onNavigateToTopGenres
                             )
                         }
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                PopularityScoreCard(
+                                    score = uiState.popularityScore,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                ArtistSearchCard(
+                                    onSearchClicked = { /* Implement at a later date */ },
+                                    modifier = Modifier.padding(16.dp).weight(1f),
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun WelcomeRow(
+    displayName: String,
+    avatarUrl: String?,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Welcome Back",
+                style = MaterialTheme.typography.headlineMediumEmphasized,
+            )
+            Text(
+                text = displayName,
+                style = MaterialTheme.typography.titleLargeEmphasized,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Spacer(modifier = Modifier.weight(0.1f))
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(avatarUrl)
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.spotify_small_logo_black),
+            contentDescription = "User Profile Picture",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+        )
     }
 }
 
@@ -239,7 +294,6 @@ private fun AnalyticsNavButton(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LastPlayedSongCard(
@@ -310,6 +364,93 @@ fun LastPlayedSongCard(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun PopularityScoreCard(
+    score: Int?,
+    modifier: Modifier = Modifier
+) {
+    ElevatedCard(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialShapes.Slanted.toShape(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+        )
+    ) {
+        val progress = (score ?: 0) / 100f
+
+        Column(
+            modifier = Modifier.padding(28.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Popularity Score",
+                style = MaterialTheme.typography.titleMediumEmphasized,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .size(130.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularWavyProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.matchParentSize(),
+                    wavelength = 30.dp,
+                    waveSpeed = 8.dp,
+                )
+                Text(
+                    text = score?.toString() ?: "--",
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun ArtistSearchCard(
+    onSearchClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .clickable(onClick = onSearchClicked),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(36.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.spotify_small_logo_black),
+                contentDescription = "Spotify Logo",
+                modifier = Modifier.size(40.dp),
+                tint = Color.Unspecified
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "Find Artists",
+                style = MaterialTheme.typography.titleMediumEmphasized,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
