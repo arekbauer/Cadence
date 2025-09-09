@@ -69,7 +69,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.loadHomeScreenData()
+        viewModel.fetchInitialData()
     }
 
     Scaffold { innerPadding ->
@@ -87,7 +87,7 @@ fun HomeScreen(
                 uiState.error != null -> {
                     Column {
                         Text(text = "Error loading profile: " + uiState.error!!)
-                        Button(onClick = { viewModel.loadHomeScreenData() }) {
+                        Button(onClick = { viewModel.fetchInitialData() }) {
                             Text("Retry")
                         }
                     }
@@ -109,6 +109,7 @@ fun HomeScreen(
                             if (uiState.recentlyPlayed.isNotEmpty()) {
                                 LastPlayedSongCard(item = uiState.recentlyPlayed.first())
                             } else {
+                                // TODO: Known issue where this is constant, not updating
                                 Text("Skeleton Would be showing")
                             }
                         }
