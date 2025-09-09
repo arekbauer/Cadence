@@ -14,6 +14,10 @@ android {
     compileSdk = 36
 
     defaultConfig {
+        manifestPlaceholders += mapOf(
+            "redirectSchemeName" to "cadence-app",
+            "redirectHostName" to "callback"
+        )
         applicationId = "com.arekb.cadence"
         minSdk = 29
         targetSdk = 35
@@ -31,10 +35,6 @@ android {
         buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"${localProperties.getProperty("SPOTIFY_CLIENT_SECRET")}\"")
 
         // Spotify callback URI
-        manifestPlaceholders += mapOf(
-            "redirectSchemeName" to "cadence-app",
-            "redirectHostName" to "callback"
-        )
     }
 
     buildTypes {

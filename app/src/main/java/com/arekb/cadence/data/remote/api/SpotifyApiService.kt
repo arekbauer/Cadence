@@ -1,5 +1,6 @@
 package com.arekb.cadence.data.remote.api
 
+import com.arekb.cadence.data.remote.dto.NewReleasesResponse
 import com.arekb.cadence.data.remote.dto.RecentlyPlayedResponse
 import com.arekb.cadence.data.remote.dto.TopArtistResponse
 import com.arekb.cadence.data.remote.dto.TopItemsResponse
@@ -49,4 +50,13 @@ interface SpotifyApiService {
     suspend fun getRecentlyPlayed(
         @Query("limit") limit: Int
     ): Response<RecentlyPlayedResponse>
+
+    /**
+     * Fetches the user's new releases.
+     * @param limit The number of items to return. Default: 20. Max: 50.
+     */
+    @GET("v1/browse/new-releases")
+    suspend fun getNewReleases(
+        @Query("limit") limit: Int
+    ): Response<NewReleasesResponse>
 }
