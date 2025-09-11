@@ -212,10 +212,12 @@ class UserRepositoryImpl @Inject constructor(
         },
         saveFetchResult = { response ->
             if (response.isSuccessful && response.body() != null) {
-                val newReleasesDto = response.body()!!
+                val newReleasesResponse = response.body()!!
+                // Access the list of items via the 'albums' property
+                val albumItems = newReleasesResponse.albums.items
 
                 // Map the DTOs from the API to your database entities
-                val newReleaseEntities = newReleasesDto.albums.items.map { album ->
+                val newReleaseEntities = albumItems.map { album ->
                     NewReleasesEntity(
                         id = album.id,
                         name = album.name,
@@ -233,13 +235,14 @@ class UserRepositoryImpl @Inject constructor(
             }
         },
         shouldFetch = { cachedReleases ->
-            if (cachedReleases.isNullOrEmpty()) {
+            val shouldFetch = if (cachedReleases.isNullOrEmpty()) {
                 true // Always fetch if the cache is empty.
             } else {
                 val firstRelease = cachedReleases.first()
                 val isStale = System.currentTimeMillis() - firstRelease.lastFetched > CACHE_EXPIRATION_MS_NEW_RELEASES
                 isStale
             }
+            shouldFetch
         }
     )
 }

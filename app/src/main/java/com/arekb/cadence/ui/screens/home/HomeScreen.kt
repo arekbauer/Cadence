@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +34,8 @@ import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +50,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +60,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.arekb.cadence.R
+import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
 import com.arekb.cadence.data.remote.dto.PlayHistoryObject
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -77,10 +82,6 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(key1 = Unit) {
-        viewModel.fetchInitialData()
-    }
-
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -96,13 +97,14 @@ fun HomeScreen(
                 uiState.error != null -> {
                     Column {
                         Text(text = "Error loading profile: " + uiState.error!!)
-                        Button(onClick = { viewModel.fetchInitialData() }) {
+                        Button(onClick = { viewModel.onRetry() }) {
                             Text("Retry")
                         }
                     }
                 }
 
                 uiState.userProfile != null -> {
+                    val uriHandler = LocalUriHandler.current
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = 48.dp),
@@ -145,6 +147,20 @@ fun HomeScreen(
                                     onSearchClicked = { /* Implement at a later date */ },
                                     modifier = Modifier.padding(16.dp).weight(1f),
                                 )
+                            }
+                        }
+                        if (uiState.newReleases.isNotEmpty()) {
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                NewReleasesCarousel(
+                                    releases = uiState.newReleases,
+                                    onAlbumClick = { albumId ->
+                                        // Construct the Spotify album URL and open it
+                                        val spotifyUrl = "https://open.spotify.com/album/$albumId"
+                                        uriHandler.openUri(spotifyUrl)
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
                             }
                         }
                     }
@@ -205,7 +221,7 @@ fun AnalyticsHubCard(
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp)
+        shape = MaterialTheme.shapes.extraLarge
     ) {
         Column(
             modifier = Modifier
@@ -224,8 +240,7 @@ fun AnalyticsHubCard(
             // Card Header
             Text(
                 text = "Analytics Hub",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineSmallEmphasized,
                 color = MaterialTheme.colorScheme.onTertiaryContainer
             )
             Text(
@@ -312,7 +327,7 @@ fun LastPlayedSongCard(
 ) {
     ElevatedCard(
         modifier = modifier.fillMaxWidth().padding(16.dp),
-        shape = RoundedCornerShape(24.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
@@ -461,6 +476,120 @@ fun ArtistSearchCard(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun NewReleasesCarousel(
+    releases: List<NewReleasesEntity>,
+    modifier: Modifier = Modifier,
+    onAlbumClick: (String) -> Unit
+) {
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = MaterialTheme.shapes.extraLarge
+    ) {
+        Column(
+            modifier = Modifier.background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.surfaceContainer,
+                        MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                )
+            ).padding(top = 20.dp, bottom = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "New Releases",
+                style = MaterialTheme.typography.headlineSmallEmphasized,
+                modifier = Modifier.padding(bottom = 2.dp)
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            HorizontalMultiBrowseCarousel(
+                state = rememberCarouselState { releases.size },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                preferredItemWidth = 150.dp,
+                itemSpacing = 16.dp,
+                contentPadding = PaddingValues(horizontal = 16.dp)
+            ) { index ->
+                val release = releases[index]
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clickable { onAlbumClick(release.id) }
+                ) {
+                    Box(modifier = Modifier.fillMaxSize().maskClip(MaterialTheme.shapes.large)) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(release.imageUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Album art for ${release.name}",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f)),
+                                        startY = 150f
+                                    )
+                                )
+                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.Bottom
+                        ) {
+                            Text(
+                                text = release.name,
+                                style = MaterialTheme.typography.titleSmallEmphasized,
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = release.artistName,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Color.White.copy(alpha = 0.9f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Play on Spotify",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                )
+            }
         }
     }
 }
