@@ -64,9 +64,18 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToMyTopTracks: () -> Unit,
     onNavigateToMyTopArtists: () -> Unit,
-    onNavigateToTopGenres: () -> Unit
+    onNavigateToTopGenres: () -> Unit,
+    onLogout: () -> Unit
 ){
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is HomeViewEvent.NavigateToLogin -> onLogout()
+            }
+        }
+    }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.fetchInitialData()

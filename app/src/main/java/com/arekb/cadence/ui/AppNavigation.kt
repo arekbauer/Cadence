@@ -10,7 +10,6 @@ import androidx.navigation.compose.rememberNavController
 import com.arekb.cadence.data.repository.AuthRepository
 import com.arekb.cadence.ui.screens.genres.GenresScreen
 import com.arekb.cadence.ui.screens.home.HomeScreen
-import com.arekb.cadence.ui.screens.home.HomeViewEvent
 import com.arekb.cadence.ui.screens.home.HomeViewModel
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
@@ -39,21 +38,6 @@ fun AppNavigation(
         }
     }
 
-    // Listen for the logout event from the HomeViewModel
-    val homeViewModel: HomeViewModel = hiltViewModel()
-    LaunchedEffect(Unit) {
-        homeViewModel.eventFlow.collect { event ->
-            when (event) {
-                is HomeViewEvent.NavigateToLogin -> {
-                    navController.navigate("login") {
-                        // Clear the entire back stack so the user can't go back to the broken home screen
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    }
-                }
-            }
-        }
-    }
-
     // Start navigation is always login, the LaunchedEffect will navigate to home if logged in
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -68,6 +52,7 @@ fun AppNavigation(
             )
         }
         composable("home") {
+            val homeViewModel: HomeViewModel = hiltViewModel()
             HomeScreen(
                 viewModel = homeViewModel,
                 onNavigateToMyTopTracks = {
@@ -78,6 +63,11 @@ fun AppNavigation(
                 },
                 onNavigateToTopGenres = {
                     navController.navigate("analytics")
+                },
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
                 }
             )
         }

@@ -2,6 +2,7 @@ package com.arekb.cadence.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
 import com.arekb.cadence.data.remote.dto.PlayHistoryObject
 import com.arekb.cadence.data.repository.UserRepository
@@ -63,6 +64,21 @@ class HomeViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = "Failed to load recent tracks.") }
             }
         }
+    }
+
+    private fun calculatePopularityScore(artists: List<TopArtistsEntity>?): Int? {
+        if (artists.isNullOrEmpty()) return null
+
+        val maxWeight = artists.size
+        val totalWeight = (maxWeight * (maxWeight + 1)) / 2.0
+        if (totalWeight == 0.0) return 0
+
+        val weightedPopularitySum = artists.withIndex().sumOf { (index, artist) ->
+            val weight = maxWeight - index
+            (artist.popularity * weight).toDouble()
+        }
+
+        return (weightedPopularitySum / totalWeight).toInt()
     }
 
     data class HomeUiState(
