@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -120,8 +121,7 @@ fun HomeScreen(
                             if (uiState.recentlyPlayed.isNotEmpty()) {
                                 LastPlayedSongCard(item = uiState.recentlyPlayed.first())
                             } else {
-                                // TODO: Known issue where this is constant, not updating
-                                Text("Skeleton Would be showing")
+                                EmptyLastPlayedCard()
                             }
                         }
                         item {
@@ -326,7 +326,7 @@ fun LastPlayedSongCard(
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
-        modifier = modifier.fillMaxWidth().padding(16.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 8.dp),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
@@ -395,6 +395,62 @@ fun LastPlayedSongCard(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
+fun EmptyLastPlayedCard(
+    modifier: Modifier = Modifier
+) {
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp, vertical = 8.dp),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Icon Placeholder
+            Box(
+                modifier = Modifier
+                    .size(68.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.History,
+                    contentDescription = "No history icon",
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            // Informational Text
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Nothing played recently",
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Your listening history will show up here.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
 fun PopularityScoreCard(
     score: Int?,
     modifier: Modifier = Modifier
@@ -432,7 +488,7 @@ fun PopularityScoreCard(
                     waveSpeed = 8.dp,
                 )
                 Text(
-                    text = score?.toString() ?: "--",
+                    text = score?.toString() ?: "N/A",
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -451,7 +507,6 @@ fun ArtistSearchCard(
     Card(
         modifier = modifier
             .clickable(onClick = onSearchClicked),
-        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
@@ -518,7 +573,7 @@ fun NewReleasesCarousel(
                     .fillMaxWidth()
                     .height(150.dp),
                 preferredItemWidth = 150.dp,
-                itemSpacing = 16.dp,
+                itemSpacing = 8.dp,
                 contentPadding = PaddingValues(horizontal = 16.dp)
             ) { index ->
                 val release = releases[index]
