@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,75 +28,75 @@ class HomeViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     init {
-        fetchInitialData()
+        initialise()
     }
 
-    private fun fetchInitialData() {
+    private fun initialise() {
+        // Set the initial loading state
         _uiState.update { it.copy(isLoading = true, error = null) }
 
-        // This parent job will now complete because all its children will complete.
+        // Launch all the observers. They will run concurrently.
+        observeProfile()
+        observeTopArtists()
+        observeNewReleases()
+        fetchRecentlyPlayed()
+    }
+
+    private fun observeProfile() {
         viewModelScope.launch {
-
-            // Fetch user profile
-            launch {
-                try {
-                    // Use .first() to get the first result and allow the coroutine to finish.
-                    val result = userRepository.getProfile().first()
-                    result.fold(
-                        onSuccess = { user -> _uiState.update { it.copy(userProfile = user) } },
-                        onFailure = { _uiState.update { it.copy(error = "Failed to load profile.") } }
-                    )
-                } catch (e: Exception) {
-                    _uiState.update { it.copy(error = "Failed to load profile. Exception: ${e.message}") }
-                }
+            userRepository.getProfile().collect { result ->
+                result.fold(
+                    onSuccess = { user ->
+                        _uiState.update {
+                            it.copy(isLoading = (user == null), userProfile = user)
+                        }
+                    },
+                    onFailure = { error ->
+                        _uiState.update { it.copy(isLoading = false, error = "Failed to load profile: ${error.message}") }
+                    }
+                )
             }
+        }
+    }
 
-            // Fetch recently played tracks (this was already correct as it's a suspend function)
-            launch {
-                val recentlyPlayedResult = userRepository.getRecentlyPlayed()
-                recentlyPlayedResult.onSuccess { tracks ->
-                    _uiState.update { it.copy(recentlyPlayed = tracks) }
-                }.onFailure {
-                    _uiState.update { it.copy(error = "Failed to load recent tracks.") }
-                }
+    private fun observeTopArtists() {
+        viewModelScope.launch {
+            userRepository.getTopArtists("long_term", 50).collect { result ->
+                result.fold(
+                    onSuccess = { artists ->
+                        val score = calculatePopularityScore(artists)
+                        _uiState.update { it.copy(popularityScore = score) }
+                    },
+                    onFailure = { error ->
+                        _uiState.update { it.copy(error = "Failed to calculate score: ${error.message}") }
+                    }
+                )
             }
+        }
+    }
 
-            // Fetch top artists to calculate popularity score
-            launch {
-                try {
-                    // Use .first() to get the first result and allow the coroutine to finish.
-                    val result = userRepository.getTopArtists("long_term", 50).first()
-                    result.fold(
-                        onSuccess = { artists ->
-                            val score = calculatePopularityScore(artists)
-                            _uiState.update { it.copy(popularityScore = score) }
-                        },
-                        onFailure = { _uiState.update { it.copy(error = "Failed to calculate score.") } }
-                    )
-                } catch (e: Exception) {
-                    _uiState.update { it.copy(error = "Failed to calculate score. Exception: ${e.message}") }
-                }
+    private fun observeNewReleases() {
+        viewModelScope.launch {
+            userRepository.getNewReleases(limit = 20).collect { result ->
+                result.fold(
+                    onSuccess = { releases ->
+                        _uiState.update { it.copy(newReleases = releases ?: emptyList()) }
+                    },
+                    onFailure = { error ->
+                        _uiState.update { it.copy(error = "Failed to load new releases: ${error.message}") }
+                    }
+                )
             }
+        }
+    }
 
-            // Fetch new releases
-            launch {
-                try {
-                    // Use .first() to get the first result and allow the coroutine to finish.
-                    val result = userRepository.getNewReleases(limit = 20).first()
-                    result.fold(
-                        onSuccess = { releases ->
-                            _uiState.update { it.copy(newReleases = releases ?: emptyList()) }
-                        },
-                        onFailure = { _uiState.update { it.copy(error = "Failed to load new releases.") } }
-                    )
-                } catch (e: Exception) {
-                    _uiState.update { it.copy(error = "Failed to load new releases. Exception: ${e.message}") }
-                }
+    private fun fetchRecentlyPlayed() {
+        viewModelScope.launch {
+            userRepository.getRecentlyPlayed().onSuccess { tracks ->
+                _uiState.update { it.copy(recentlyPlayed = tracks) }
+            }.onFailure { error ->
+                _uiState.update { it.copy(error = "Failed to load recent tracks: ${error.message}") }
             }
-
-        }.invokeOnCompletion {
-            // This block will now execute correctly, hiding the loading indicator.
-            _uiState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -116,9 +115,7 @@ class HomeViewModel @Inject constructor(
         return (weightedPopularitySum / totalWeight).toInt()
     }
 
-    fun onRetry() {
-        fetchInitialData()
-    }
+    fun onRetry() { initialise() }
 }
 
 data class HomeUiState(

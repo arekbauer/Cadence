@@ -210,7 +210,6 @@ fun WelcomeRow(
     }
 }
 
-// TODO: Temporary solution for now, looks decent though
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AnalyticsHubCard(
@@ -234,7 +233,7 @@ fun AnalyticsHubCard(
                         )
                     )
                 )
-                .padding(16.dp), // Extra bottom padding for the wave
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Card Header
@@ -249,7 +248,7 @@ fun AnalyticsHubCard(
                 color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Horizontal row for the shaped navigation buttons
             Row(
@@ -564,6 +563,22 @@ fun NewReleasesCarousel(
                 style = MaterialTheme.typography.headlineSmallEmphasized,
                 modifier = Modifier.padding(bottom = 2.dp)
             )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Play on Spotify",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -628,23 +643,7 @@ fun NewReleasesCarousel(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp),
-                    tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Play on Spotify",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
-                )
-            }
+
         }
     }
 }
