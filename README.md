@@ -8,11 +8,8 @@ Here's a quick preview of the progress so far. The app features a clean, express
 
 <p align="center">
   <img src=".github/assets/home_screen.png" width="300">
-  &nbsp; &nbsp; &nbsp; &nbsp;
   <img src=".github/assets/top_tracks.png" width="300">
-  &nbsp; &nbsp; &nbsp; &nbsp;
   <img src=".github/assets/top_artists.png" width="300">
-  &nbsp; &nbsp; &nbsp; &nbsp;
   <img src=".github/assets/top_genres.png" width="300">
 </p>  
 
