@@ -504,8 +504,9 @@ fun ArtistSearchCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .clickable(onClick = onSearchClicked),
+        onClick = onSearchClicked,
+        shape = MaterialShapes.Bun.toShape(),
+        modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
@@ -563,22 +564,6 @@ fun NewReleasesCarousel(
                 style = MaterialTheme.typography.headlineSmallEmphasized,
                 modifier = Modifier.padding(bottom = 2.dp)
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp),
-                    tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Play on Spotify",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
-                )
-            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -594,9 +579,8 @@ fun NewReleasesCarousel(
                 val release = releases[index]
 
                 Card(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .clickable { onAlbumClick(release.id) }
+                    onClick = { onAlbumClick(release.id) },
+                    modifier = Modifier.fillMaxHeight()
                 ) {
                     Box(modifier = Modifier.fillMaxSize().maskClip(MaterialTheme.shapes.large)) {
                         AsyncImage(
@@ -642,6 +626,23 @@ fun NewReleasesCarousel(
                         }
                     }
                 }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp),
+                    tint = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Open on Spotify",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
+                )
             }
 
         }
