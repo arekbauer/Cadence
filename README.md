@@ -7,6 +7,8 @@ Cadence is a modern Android application built to explore personal Spotify listen
 Here's a quick preview of the progress so far. The app features a clean, expressive Material 3 design with dynamic animations.  
 
 <p align="center">
+  <img src=".github/assets/home_screen.png" width="300">
+  &nbsp; &nbsp; &nbsp; &nbsp;
   <img src=".github/assets/top_tracks.png" width="300">
   &nbsp; &nbsp; &nbsp; &nbsp;
   <img src=".github/assets/top_artists.png" width="300">
@@ -78,16 +80,14 @@ Phase 1: Foundation & Authentication (✅ Complete)
 
     Robust caching layer with the Room persistence library to support offline viewing and provide an instant-loading UI.
 
-Phase 2: User Analytics Features (In Progress)
+Phase 2: User Analytics Features (✅ Complete)
 
-    Top Tracks & Artists: (✅ Complete) Implemented screens to fetch and display the user's top items.
+    Top Tracks & Artists: Implemented screens to fetch and display the user's top items.
 
     Genre Deep Dive: Building the logic to process and visualize the user's most-listened-to genres.
 
     Popularity Score: Developing the logic to calculate and display the user's "mainstream vs. obscure" score.
 
-Phase 3: Music Library Exploration (Planned)
+Phase 3: Music Library Exploration (In-Progress)
 
     Artist Pages: Creating dedicated pages to explore an artist's discography.
-
-    View Your Albums: Building the interface to browse a user's saved albums.

@@ -1,12 +1,15 @@
 package com.arekb.cadence.data.repository
 
+import com.arekb.cadence.data.local.database.dao.NewReleasesDao
 import com.arekb.cadence.data.local.database.dao.TopArtistsDao
 import com.arekb.cadence.data.local.database.dao.TopTracksDao
 import com.arekb.cadence.data.local.database.dao.UserProfileDao
+import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
 import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
 import com.arekb.cadence.data.remote.api.SpotifyApiService
+import com.arekb.cadence.data.remote.dto.PlayHistoryObject
 import com.arekb.cadence.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.TimeUnit
@@ -16,7 +19,8 @@ class UserRepositoryImpl @Inject constructor(
     private val api: SpotifyApiService,
     private val dao: UserProfileDao,
     private val tracksDao: TopTracksDao,
-    private val artistsDao: TopArtistsDao
+    private val artistsDao: TopArtistsDao,
+    private val newReleasesDao: NewReleasesDao
 ) : UserRepository {
 
     override fun getProfile(): Flow<Result<UserProfileEntity?>> = networkBoundResource(
@@ -184,6 +188,64 @@ class UserRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+    override suspend fun getRecentlyPlayed(): Result<List<PlayHistoryObject>> {
+        return try {
+            val response = api.getRecentlyPlayed(limit = 1)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!.items)
+            } else {
+                Result.failure(Exception("Failed to fetch recently played tracks"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun getNewReleases(limit: Int):
+            Flow<Result<List<NewReleasesEntity>?>> = networkBoundResource(
+        query = {
+            newReleasesDao.getNewReleases()
+        },
+        fetch = {
+            api.getNewReleases(limit)
+        },
+        saveFetchResult = { response ->
+            if (response.isSuccessful && response.body() != null) {
+                val newReleasesResponse = response.body()!!
+                // Access the list of items via the 'albums' property
+                val albumItems = newReleasesResponse.albums.items
+
+                // Map the DTOs from the API to your database entities
+                val newReleaseEntities = albumItems.map { album ->
+                    NewReleasesEntity(
+                        id = album.id,
+                        name = album.name,
+                        artistName = album.artists.firstOrNull()?.name ?: "Unknown",
+                        imageUrl = album.images.firstOrNull()?.url ?: "",
+                        releaseDate = album.releaseDate,
+                        totalTracks = album.totalTracks,
+                        lastFetched = System.currentTimeMillis()
+                    )
+                }
+
+                // Save the fresh data to the database in a transaction
+                newReleasesDao.clearNewReleases()
+                newReleasesDao.insertNewReleases(newReleaseEntities)
+            }
+        },
+        shouldFetch = { cachedReleases ->
+            val shouldFetch = if (cachedReleases.isNullOrEmpty()) {
+                true // Always fetch if the cache is empty.
+            } else {
+                val firstRelease = cachedReleases.first()
+                val isStale = System.currentTimeMillis() - firstRelease.lastFetched > CACHE_EXPIRATION_MS_NEW_RELEASES
+                isStale
+            }
+            shouldFetch
+        }
+    )
 }
 
 private val CACHE_EXPIRATION_MS = TimeUnit.HOURS.toMillis(1)
+private val CACHE_EXPIRATION_MS_NEW_RELEASES = TimeUnit.HOURS.toMillis(24)

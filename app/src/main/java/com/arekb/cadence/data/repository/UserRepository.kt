@@ -1,8 +1,10 @@
 package com.arekb.cadence.data.repository
 
+import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
 import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
+import com.arekb.cadence.data.remote.dto.PlayHistoryObject
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -44,4 +46,16 @@ interface UserRepository {
      */
     suspend fun forceRefreshTopArtists(timeRange: String): Result<Unit>
 
+    /**
+     * Retrieves the user's recently played tracks.
+     * @return A [Flow] of [Result] containing the user's recently played tracks.
+     */
+    suspend fun getRecentlyPlayed(): Result<List<PlayHistoryObject>>
+
+    /**
+     * Retrieves new album releases, using a caching strategy.
+     * @param limit The maximum number of releases to retrieve.
+     * @return A [Flow] of [Result] containing the new album releases.
+     */
+    fun getNewReleases(limit: Int): Flow<Result<List<NewReleasesEntity>?>>
 }

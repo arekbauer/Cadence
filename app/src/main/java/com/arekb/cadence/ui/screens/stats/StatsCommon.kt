@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
-import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -55,11 +54,7 @@ fun StatsTimeRangeToolbar(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 options.forEachIndexed { index, label ->
                     ToggleButton(
-                        shapes = ToggleButtonShapes(
-                            shape = ToggleButtonDefaults.shape,
-                            pressedShape = ToggleButtonDefaults.shape,
-                            checkedShape = ToggleButtonDefaults.shape
-                        ),
+                        shapes = ToggleButtonDefaults.shapes(checkedShape = MaterialTheme.shapes.large),
                         checked = selectedIndex == index,
                         onCheckedChange = { if (it) onSelectionChanged(index) }
                     ) {

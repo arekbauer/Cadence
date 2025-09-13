@@ -165,7 +165,7 @@ fun GenresScreen(
                                 }
                             }
                         }
-                        ElevatedCard(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                        ElevatedCard(modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainer
                             )
