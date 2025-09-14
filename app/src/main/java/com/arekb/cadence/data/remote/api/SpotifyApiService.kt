@@ -2,6 +2,7 @@ package com.arekb.cadence.data.remote.api
 
 import com.arekb.cadence.data.remote.dto.NewReleasesResponse
 import com.arekb.cadence.data.remote.dto.RecentlyPlayedResponse
+import com.arekb.cadence.data.remote.dto.SearchResponseDto
 import com.arekb.cadence.data.remote.dto.TopArtistResponse
 import com.arekb.cadence.data.remote.dto.TopItemsResponse
 import com.arekb.cadence.data.remote.dto.UserProfile
@@ -59,4 +60,18 @@ interface SpotifyApiService {
     suspend fun getNewReleases(
         @Query("limit") limit: Int
     ): Response<NewReleasesResponse>
+
+    /**
+     * Searches for an item.
+     * @param query The search query.
+     * @param type The type of item to search for. Valid values: track, album, artist.
+     * @param limit The number of items to return. Default: 20. Max: 50.
+     */
+    @GET("v1/search")
+    suspend fun searchForItem(
+        @Query("q") query: String,
+        @Query("type") type: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int
+    ): SearchResponseDto
 }

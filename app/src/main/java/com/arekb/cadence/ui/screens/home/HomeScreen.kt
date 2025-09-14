@@ -71,6 +71,7 @@ fun HomeScreen(
     onNavigateToMyTopTracks: () -> Unit,
     onNavigateToMyTopArtists: () -> Unit,
     onNavigateToTopGenres: () -> Unit,
+    onNavigateToSearch: () -> Unit,
     onLogout: () -> Unit
 ){
     val uiState by viewModel.uiState.collectAsState()
@@ -144,7 +145,7 @@ fun HomeScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                                 ArtistSearchCard(
-                                    onSearchClicked = { /* Implement at a later date */ },
+                                    onSearchClicked = onNavigateToSearch,
                                     modifier = Modifier.padding(16.dp).weight(1f),
                                 )
                             }

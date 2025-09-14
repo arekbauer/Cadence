@@ -13,6 +13,7 @@ import com.arekb.cadence.ui.screens.home.HomeScreen
 import com.arekb.cadence.ui.screens.home.HomeViewModel
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
+import com.arekb.cadence.ui.screens.search.SearchScreen
 import com.arekb.cadence.ui.screens.stats.artists.TopArtistsScreen
 import com.arekb.cadence.ui.screens.stats.tracks.TopTracksScreen
 import kotlinx.coroutines.launch
@@ -64,6 +65,9 @@ fun AppNavigation(
                 onNavigateToTopGenres = {
                     navController.navigate("analytics")
                 },
+                onNavigateToSearch = {
+                    navController.navigate("search")
+                },
                 onLogout = {
                     navController.navigate("login") {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
@@ -87,6 +91,13 @@ fun AppNavigation(
         }
         composable("analytics"){
             GenresScreen(
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+        composable("search"){
+            SearchScreen(
                 onNavigateBack = {
                     navController.navigateUp()
                 }

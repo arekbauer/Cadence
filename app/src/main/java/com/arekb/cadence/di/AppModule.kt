@@ -1,11 +1,12 @@
 package com.arekb.cadence.di
 
-import com.arekb.cadence.data.remote.api.AuthInterceptor
 import com.arekb.cadence.data.remote.api.SpotifyApiService
 import com.arekb.cadence.data.remote.api.SpotifyAuthApiService
 import com.arekb.cadence.data.remote.api.TokenRefreshAuthenticator
 import com.arekb.cadence.data.repository.AuthRepository
 import com.arekb.cadence.data.repository.AuthRepositoryImpl
+import com.arekb.cadence.data.repository.SearchRepository
+import com.arekb.cadence.data.repository.SearchRepositoryImpl
 import com.arekb.cadence.data.repository.UserRepository
 import com.arekb.cadence.data.repository.UserRepositoryImpl
 import dagger.Binds
@@ -31,6 +32,10 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSearchRepository(impl: SearchRepositoryImpl): SearchRepository
 
     companion object {
 

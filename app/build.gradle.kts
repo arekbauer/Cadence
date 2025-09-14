@@ -74,6 +74,8 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.graphics.shapes)
     implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.paging.common)
+    implementation(libs.androidx.paging.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
