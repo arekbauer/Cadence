@@ -24,6 +24,7 @@ roomRuntime = "2.7.2"
 securityCrypto = "1.1.0"
 datastoreCoreAndroid = "1.1.7"
 pagingCommon = "3.3.6"
+uiText = "1.9.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -58,6 +59,7 @@ androidx-datastore-core-android = { group = "androidx.datastore", name = "datast
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "pagingCommon" }
+androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

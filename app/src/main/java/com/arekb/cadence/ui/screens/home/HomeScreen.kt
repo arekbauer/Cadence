@@ -383,7 +383,7 @@ fun LastPlayedSongCard(
 
                 // Spotify Logo
                 Icon(
-                    painter = painterResource(id = R.drawable.spotify_small_logo_black), // Replace with your drawable
+                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
                     contentDescription = "Spotify Logo",
                     modifier = Modifier.size(28.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -523,7 +523,7 @@ fun ArtistSearchCard(
                 painter = painterResource(id = R.drawable.spotify_small_logo_black),
                 contentDescription = "Spotify Logo",
                 modifier = Modifier.size(40.dp),
-                tint = Color.Unspecified
+                tint = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
