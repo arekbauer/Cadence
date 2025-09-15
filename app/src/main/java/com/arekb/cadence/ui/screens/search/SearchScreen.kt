@@ -14,16 +14,19 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -33,13 +36,14 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -63,8 +67,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -109,7 +114,6 @@ fun SearchScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
-                    // CHANGED: Detect when the focus state changes
                     .onFocusChanged { focusState ->
                         isSearchActive = focusState.isFocused
                     },
@@ -120,8 +124,6 @@ fun SearchScreen(
                     focusManager.clearFocus()
                 })
             )
-
-            // CHANGED: The ButtonGroup is now wrapped in AnimatedVisibility
             AnimatedVisibility(
                 visible = isSearchActive,
                 enter = fadeIn(animationSpec = tween(200)) + slideInVertically(),
@@ -160,98 +162,7 @@ fun SearchScreen(
             if (query.isBlank()) {
                 IdleSearchPrompt(modifier = Modifier.weight(1f))
             } else {
-                SearchResultsContent(pagingItems = searchResults)
-            }
-        }
-    }
-}
-
-@Composable
-fun ExpressiveSearchTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    placeholder: @Composable (() -> Unit)? = null,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    singleLine: Boolean = true
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        placeholder = placeholder,
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-        trailingIcon = {
-            // Show a clear button only when there is text
-            if (value.isNotEmpty()) {
-                IconButton(onClick = { onValueChange("") }) {
-                    Icon(Icons.Default.Close, contentDescription = "Clear search")
-                }
-            }
-        },
-        shape = CircleShape,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        ),
-        singleLine = singleLine,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = keyboardActions
-    )
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun SearchResultsContent(pagingItems: LazyPagingItems<SearchResult>) {
-    // Handle the initial loading state (for the whole screen)
-    when (val state = pagingItems.loadState.refresh) {
-        is LoadState.Loading -> {
-            Box(Modifier.fillMaxSize()) {
-                CircularWavyProgressIndicator(Modifier.align(Alignment.Center))
-            }
-        }
-        is LoadState.Error -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error: ${state.error.message}")
-            }
-        }
-        else -> {
-            if (pagingItems.itemCount == 0) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No results found.")
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(
-                        count = pagingItems.itemCount,
-                        key = { index -> pagingItems.peek(index)?.id ?: index }
-                    ) { index ->
-                        val result = pagingItems[index]
-                        if (result != null) {
-                            SearchResultItem(result = result)
-                        }
-                    }
-
-                    // Handle loading state for the next page (append)
-                    when (val appendState = pagingItems.loadState.append) {
-                        is LoadState.Loading -> {
-                            item {
-                                Box(Modifier.fillMaxWidth().padding(16.dp)) {
-                                    CircularWavyProgressIndicator(Modifier.align(Alignment.Center))
-                                }
-                            }
-                        }
-                        is LoadState.Error -> {
-                            item { Text("Error loading more: ${appendState.error.message}") }
-                        }
-                        else -> {}
-                    }
-                }
+                SearchResultsGrid(pagingItems = searchResults)
             }
         }
     }
@@ -338,22 +249,143 @@ fun IdleSearchPrompt(modifier: Modifier = Modifier) {
     }
 }
 
-// TODO: Look into changing
 @Composable
-fun SearchResultItem(result: SearchResult) {
-    ListItem(
-        modifier = Modifier.clip(MaterialTheme.shapes.medium),
-        headlineContent = { Text(result.title, fontWeight = FontWeight.SemiBold) },
-        supportingContent = { Text(result.subtitle) },
-        leadingContent = {
+fun ExpressiveSearchTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: @Composable (() -> Unit)? = null,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = true
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        placeholder = placeholder,
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+        trailingIcon = {
+            // Show a clear button only when there is text
+            if (value.isNotEmpty()) {
+                IconButton(onClick = { onValueChange("") }) {
+                    Icon(Icons.Default.Close, contentDescription = "Clear search")
+                }
+            }
+        },
+        shape = CircleShape,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        singleLine = singleLine,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = keyboardActions
+    )
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>)
+{
+    // Handle the initial loading state for the whole screen
+    when (val state = pagingItems.loadState.refresh) {
+        is LoadState.Loading -> {
+            Box(Modifier.fillMaxSize()) {
+                CircularWavyProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        }
+        is LoadState.Error -> {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Error: ${state.error.message}")
+            }
+        }
+        else -> {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(150.dp),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(
+                    count = pagingItems.itemCount,
+                    key = { index -> pagingItems.peek(index)?.id ?: index }
+                ) { index ->
+                    val result = pagingItems[index]
+                    if (result != null) {
+                        GridSearchResultItem(
+                            result = result,
+                            onClick = { /* TODO: Handle click */ },
+                        )
+                    }
+                }
+
+                // Handle loading/error state for the next page (append)
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    when (val appendState = pagingItems.loadState.append) {
+                        is LoadState.Loading -> {
+                            Box(Modifier.fillMaxWidth().padding(32.dp)) {
+                                CircularWavyProgressIndicator(Modifier.align(Alignment.Center))
+                            }
+                        }
+                        is LoadState.Error -> {
+                            Text("Error loading more: ${appendState.error.message}",
+                                modifier = Modifier.padding(16.dp))
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun GridSearchResultItem(
+    result: SearchResult,
+    onClick: () -> Unit,
+) {
+    Card(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             AsyncImage(
                 model = result.imageUrl,
                 contentDescription = "Image for ${result.title}",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(MaterialTheme.shapes.large)
             )
+            Column(
+                modifier = Modifier.padding(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = result.title,
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = result.subtitle,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
         }
-    )
+    }
 }
