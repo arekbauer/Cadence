@@ -40,11 +40,11 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -295,7 +295,7 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>)
     when (val state = pagingItems.loadState.refresh) {
         is LoadState.Loading -> {
             Box(Modifier.fillMaxSize()) {
-                CircularWavyProgressIndicator(Modifier.align(Alignment.Center))
+                LoadingIndicator(Modifier.align(Alignment.Center))
             }
         }
         is LoadState.Error -> {
@@ -329,7 +329,7 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>)
                     when (val appendState = pagingItems.loadState.append) {
                         is LoadState.Loading -> {
                             Box(Modifier.fillMaxWidth().padding(32.dp)) {
-                                CircularWavyProgressIndicator(Modifier.align(Alignment.Center))
+                                LoadingIndicator(Modifier.align(Alignment.Center))
                             }
                         }
                         is LoadState.Error -> {
