@@ -4,10 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.arekb.cadence.data.repository.AuthRepository
+import com.arekb.cadence.ui.screens.artist.ArtistScreen
 import com.arekb.cadence.ui.screens.genres.GenresScreen
 import com.arekb.cadence.ui.screens.home.HomeScreen
 import com.arekb.cadence.ui.screens.home.HomeViewModel
@@ -98,6 +101,19 @@ fun AppNavigation(
         }
         composable("search"){
             SearchScreen(
+                onNavigateToArtist = { artistId ->
+                    navController.navigate("artist/$artistId")
+                },
+                onNavigateBack = {
+                    navController.navigateUp()
+                }
+            )
+        }
+        composable(
+            route = "artist/{artistId}",
+            arguments = listOf(navArgument("artistId") { type = NavType.StringType })
+        ) {
+            ArtistScreen(
                 onNavigateBack = {
                     navController.navigateUp()
                 }

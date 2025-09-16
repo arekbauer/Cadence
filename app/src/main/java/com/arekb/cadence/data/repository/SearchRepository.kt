@@ -13,4 +13,6 @@ interface SearchRepository {
      * @return A [Flow] of [PagingData] of [SearchResult] objects.
      */
     fun getSearchResultsStream(query: String, type: String): Flow<PagingData<SearchResult>>
+
+    suspend fun findArtistById(artistId: String): Result<SearchResult?>
 }

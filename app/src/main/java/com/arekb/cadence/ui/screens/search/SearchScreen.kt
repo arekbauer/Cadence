@@ -85,6 +85,7 @@ import com.arekb.cadence.data.remote.paging.SearchResult
 @Composable
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
+    onNavigateToArtist: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val query by viewModel.searchQuery.collectAsState()
@@ -164,7 +165,7 @@ fun SearchScreen(
             if (query.isBlank()) {
                 IdleSearchPrompt(modifier = Modifier.weight(1f))
             } else {
-                SearchResultsGrid(pagingItems = searchResults)
+                SearchResultsGrid(pagingItems = searchResults, onArtistClick = onNavigateToArtist)
             }
         }
     }
@@ -289,7 +290,8 @@ fun ExpressiveSearchTextField(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>)
+fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
+                      onArtistClick: (String) -> Unit)
 {
     // Handle the initial loading state for the whole screen
     when (val state = pagingItems.loadState.refresh) {
@@ -319,7 +321,7 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>)
                     if (result != null) {
                         GridSearchResultItem(
                             result = result,
-                            onClick = { /* TODO: Handle click */ },
+                            onClick = { onArtistClick(result.id) },
                         )
                     }
                 }

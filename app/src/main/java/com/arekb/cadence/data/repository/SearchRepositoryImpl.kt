@@ -22,4 +22,34 @@ class SearchRepositoryImpl @Inject constructor(
             pagingSourceFactory = { SearchPagingSource(api, query, type) }
         ).flow
     }
+
+    override suspend fun findArtistById(artistId: String): Result<SearchResult?> {
+        return try {
+            val response = api.searchForItem(
+                query = artistId,
+                type = "artist",
+                limit = 1, // We only need the top result
+                offset = 0
+            )
+
+            // Find the first artist in the response items
+            val artistDto = response.artists?.items?.firstOrNull()
+
+            if (artistDto != null) {
+                // Map the DTO to your SearchResult domain model
+                val searchResult = SearchResult(
+                    id = artistDto.id,
+                    imageUrl = artistDto.images.firstOrNull()?.url,
+                    title = artistDto.name,
+                    subtitle = "Artist"
+                )
+                Result.success(searchResult)
+            } else {
+                // Return success with a null value if no artist was found
+                Result.success(null)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
