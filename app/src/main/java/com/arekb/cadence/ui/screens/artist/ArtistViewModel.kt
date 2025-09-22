@@ -3,7 +3,7 @@ package com.arekb.cadence.ui.screens.artist
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arekb.cadence.data.remote.paging.SearchResult
+import com.arekb.cadence.data.remote.dto.TopArtistObject
 import com.arekb.cadence.data.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,19 +37,14 @@ class ArtistViewModel @Inject constructor(
         }
     }
 
-    //TODO: Need to use a different API endpoint, does not search via IDs
     fun findSpecificArtist(artistId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val result = searchRepository.findArtistById(artistId)
+            val result = searchRepository.getArtistById(artistId)
 
             result.onSuccess { foundArtist ->
-                if (foundArtist != null) {
-                    _uiState.update { it.copy(isLoading = false, artistDetails = foundArtist) }
-                } else {
-                    _uiState.update { it.copy(isLoading = false, error = "Artist not found.") }
-                }
+                _uiState.update { it.copy(isLoading = false, artistDetails = foundArtist) }
             }.onFailure { error ->
                 _uiState.update { it.copy(isLoading = false, error = error.message) }
             }
@@ -60,5 +55,5 @@ class ArtistViewModel @Inject constructor(
 data class ArtistUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
-    val artistDetails: SearchResult? = null
+    val artistDetails: TopArtistObject? = null
 )

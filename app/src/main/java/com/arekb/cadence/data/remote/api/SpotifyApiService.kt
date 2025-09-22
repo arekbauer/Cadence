@@ -3,11 +3,13 @@ package com.arekb.cadence.data.remote.api
 import com.arekb.cadence.data.remote.dto.NewReleasesResponse
 import com.arekb.cadence.data.remote.dto.RecentlyPlayedResponse
 import com.arekb.cadence.data.remote.dto.SearchResponseDto
+import com.arekb.cadence.data.remote.dto.TopArtistObject
 import com.arekb.cadence.data.remote.dto.TopArtistResponse
 import com.arekb.cadence.data.remote.dto.TopItemsResponse
 import com.arekb.cadence.data.remote.dto.UserProfile
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -74,4 +76,14 @@ interface SpotifyApiService {
         @Query("limit") limit: Int,
         @Query("offset") offset: Int
     ): SearchResponseDto
+
+
+    /**
+     * Fetches an artist's details.
+     * @param id The Spotify ID of the artist.
+     */
+    @GET("v1/artists/{id}")
+    suspend fun getArtist(
+        @Path("id") id: String
+    ): TopArtistObject
 }

@@ -134,7 +134,7 @@ fun SearchScreen(
             ) {
                 val filters = SearchFilter.entries.toTypedArray()
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
                 ) {
                     filters.forEachIndexed { index, filter ->
@@ -354,7 +354,7 @@ fun GridSearchResultItem(
     onClick: () -> Unit,
 ) {
     Card(
-        onClick = onClick,
+        onClick = if (result.subtitle == "Artist") onClick else ({}),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
     ) {

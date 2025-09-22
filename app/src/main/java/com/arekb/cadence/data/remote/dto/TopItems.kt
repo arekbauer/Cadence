@@ -49,7 +49,9 @@ data class TopArtistObject(
     @SerializedName("popularity")
     val popularity: Int,
     @SerializedName("genres")
-    val genres: List<String>
+    val genres: List<String>,
+    @SerializedName("uri")
+    val uri: String
 )
 
 /**
