@@ -1,9 +1,17 @@
 package com.arekb.cadence.data.repository
 
 import androidx.paging.PagingData
+import com.arekb.cadence.data.remote.dto.ArtistAlbumsResponse
+import com.arekb.cadence.data.remote.dto.ArtistTopTracksResponse
 import com.arekb.cadence.data.remote.dto.TopArtistObject
 import com.arekb.cadence.data.remote.paging.SearchResult
 import kotlinx.coroutines.flow.Flow
+
+data class ArtistPageData(
+    val details: TopArtistObject?,
+    val topTracks: ArtistTopTracksResponse?,
+    val albums: ArtistAlbumsResponse?
+)
 
 interface SearchRepository {
 
@@ -15,10 +23,11 @@ interface SearchRepository {
      */
     fun getSearchResultsStream(query: String, type: String): Flow<PagingData<SearchResult>>
 
+
     /**
-     * Get details of an artist using the Spotify artist endpoint.
-     * @param artistId The ID of the artist.
-     * @return A [Result] containing the [TopArtistObject] on success or an error message on failure.
+     * Get the details, top tracks, and albums of an artist.
+     * @param artistId The Spotify ID of the artist.
+     * @return A [Result] containing the [ArtistPageData] on success, or an [Exception] on failure.
      */
-    suspend fun getArtistById(artistId: String): Result<TopArtistObject>
+    suspend fun getArtistPageData(artistId: String): Result<ArtistPageData>
 }

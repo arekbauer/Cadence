@@ -4,9 +4,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.arekb.cadence.data.remote.api.SpotifyApiService
-import com.arekb.cadence.data.remote.dto.TopArtistObject
 import com.arekb.cadence.data.remote.paging.SearchPagingSource
 import com.arekb.cadence.data.remote.paging.SearchResult
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -24,19 +25,28 @@ class SearchRepositoryImpl @Inject constructor(
         ).flow
     }
 
-    override suspend fun getArtistById(artistId: String): Result<TopArtistObject> {
+    override suspend fun getArtistPageData(artistId: String): Result<ArtistPageData> {
         return try {
-            val response = api.getArtist(artistId)
+            // Ff any of the parallel calls fail, the others are automatically cancelled.
+            coroutineScope {
+                val detailsDeferred = async { api.getArtist(artistId) }
+                val topTracksDeferred = async { api.getArtistTopTracks(artistId) }
+                val albumsDeferred = async { api.getArtistAlbums(artistId) }
 
-            val artistDetails = TopArtistObject(
-                id = response.id,
-                name = response.name,
-                images = response.images,
-                genres = response.genres,
-                popularity = response.popularity,
-                uri = response.uri,
-            )
-            Result.success(artistDetails)
+                // Wait for all three requests to complete
+                val detailsResponse = detailsDeferred.await()
+                val topTracksResponse = topTracksDeferred.await()
+                val albumsResponse = albumsDeferred.await()
+
+                // Combine the results into the single ArtistPageData object.
+                val pageData = ArtistPageData(
+                    details = detailsResponse,
+                    topTracks = topTracksResponse,
+                    albums = albumsResponse
+                )
+
+                Result.success(pageData)
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

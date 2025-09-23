@@ -11,14 +11,6 @@ data class TopItemsResponse(
 )
 
 /**
- * Represents the top-level response from the /top/artists endpoints.
- */
-data class TopArtistResponse(
-    @SerializedName("items")
-    val items: List<TopArtistObject>
-)
-
-/**
  * Represents a full track object from the Spotify API.
  * We only include the fields we care about for now.
  */
@@ -37,6 +29,14 @@ data class TrackObject(
 )
 
 /**
+ * Represents the top-level response from the /top/artists endpoints.
+ */
+data class TopArtistResponse(
+    @SerializedName("items")
+    val items: List<TopArtistObject>
+)
+
+/**
  * Represents a top artist object.
  */
 data class TopArtistObject(
@@ -49,9 +49,7 @@ data class TopArtistObject(
     @SerializedName("popularity")
     val popularity: Int,
     @SerializedName("genres")
-    val genres: List<String>,
-    @SerializedName("uri")
-    val uri: String
+    val genres: List<String>
 )
 
 /**

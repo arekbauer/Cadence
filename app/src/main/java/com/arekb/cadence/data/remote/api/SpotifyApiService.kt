@@ -1,5 +1,7 @@
 package com.arekb.cadence.data.remote.api
 
+import com.arekb.cadence.data.remote.dto.ArtistAlbumsResponse
+import com.arekb.cadence.data.remote.dto.ArtistTopTracksResponse
 import com.arekb.cadence.data.remote.dto.NewReleasesResponse
 import com.arekb.cadence.data.remote.dto.RecentlyPlayedResponse
 import com.arekb.cadence.data.remote.dto.SearchResponseDto
@@ -77,7 +79,6 @@ interface SpotifyApiService {
         @Query("offset") offset: Int
     ): SearchResponseDto
 
-
     /**
      * Fetches an artist's details.
      * @param id The Spotify ID of the artist.
@@ -86,4 +87,30 @@ interface SpotifyApiService {
     suspend fun getArtist(
         @Path("id") id: String
     ): TopArtistObject
+
+    /**
+     * Fetches an artist's top tracks.
+     * @param artistId The Spotify ID of the artist.
+     * @param market The country to get the top tracks for. Default: GB.
+     */
+    @GET("v1/artists/{id}/top-tracks")
+    suspend fun getArtistTopTracks(
+        @Path("id") artistId: String,
+        @Query("market") market: String = "GB"
+    ): ArtistTopTracksResponse
+
+    /**
+     * Fetches an artist's albums.
+     * @param artistId The Spotify ID of the artist.
+     * @param includeGroups The types of albums to include. Valid values: album, single.
+     * @param market The country to get the albums for. Default: GB.
+     * @param limit The number of items to return. Default: 20. Max: 50.
+     */
+    @GET("v1/artists/{id}/albums")
+    suspend fun getArtistAlbums(
+        @Path("id") artistId: String,
+        @Query("include_groups") includeGroups: String = "album,single",
+        @Query("market") market: String = "GB",
+        @Query("limit") limit: Int = 20
+    ): ArtistAlbumsResponse
 }
