@@ -1,6 +1,6 @@
 package com.arekb.cadence.ui.screens.artist
 
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -39,11 +38,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.TooltipAnchorPosition
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,8 +57,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -135,16 +140,24 @@ fun ArtistDetailsContent(
     selectedIndex: Int,
     modifier: Modifier = Modifier
 ) {
+    val uriHandler = LocalUriHandler.current
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 16.dp),
+        contentPadding = PaddingValues(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Artist Details
+        // Artist Header + Open in Spotify Button
         item {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                //ArtistHeader(artist)
-                ArtistInfoSection(artist)
+                ArtistHeader(artist)
+                OpenInSpotifyButton(
+                    artist = artist,
+                    onClick = { artistId ->
+                        // Construct the Spotify artist URL and open it
+                        val spotifyUrl = "https://open.spotify.com/artist/$artistId"
+                        uriHandler.openUri(spotifyUrl)
+                    }
+                )
             }
         }
 
@@ -213,7 +226,7 @@ fun ArtistDetailsContent(
     }
 }
 
-// Optional: Extracted the Album item into its own composable for cleanliness
+
 @Composable
 private fun AlbumCard(album: SimpleAlbumObject) {
     Column(
@@ -268,109 +281,112 @@ fun ArtistViewToggleToolbar(
     })
 }
 
-
-/**
- * Creates a visually expressive header with a decorative curve and the artist image.
- */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ArtistHeader(artist: TopArtistObject) {
-    val headerColor = MaterialTheme.colorScheme.primaryContainer
-
     Box(
-        // This Box is the foundation for layering the curve and the image
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp) // Gives space for the curve and image
+            .height(250.dp)
     ) {
-        // 1. The Decorative Curve (drawn on a Canvas)
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val path = Path().apply {
-                moveTo(0f, size.height * 0.5f) // Start on the left, halfway down
-                // This creates the large curve
-                quadraticTo(
-                    x1 = size.width / 2,
-                    y1 = size.height,
-                    x2 = size.width,
-                    y2 = size.height * 0.5f
-                )
-                lineTo(size.width, 0f) // Line to top-right
-                lineTo(0f, 0f)        // Line to top-left
-                close()
-            }
-            drawPath(
-                path = path,
-                color = headerColor.copy(alpha = 0.4f) // Semi-opaque accent color
-            )
-        }
-
-        // 2. The Artist Image (placed on top of the Canvas)
         AsyncImage(
             model = artist.images.firstOrNull()?.url,
             contentDescription = "Image for ${artist.name}",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .size(220.dp)
-                .clip(CircleShape)
+            modifier = Modifier.fillMaxSize()
         )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f))
+        )
+            Row(modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(8.dp),
+                verticalAlignment = Alignment.Bottom)
+            {
+                Text(
+                    text = artist.name,
+                    style = MaterialTheme.typography.headlineLargeEmphasized,
+                    color = MaterialTheme.colorScheme.surface,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                PopularityBadge(popularity = artist.popularity)
+            }
     }
 }
 
-/**
- * Displays the popularity badge, and Spotify button.
- */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ArtistInfoSection(artist: TopArtistObject) {
+private fun OpenInSpotifyButton(
+    artist: TopArtistObject,
+    onClick : (String) -> Unit
+){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
     ) {
+        Spacer(modifier = Modifier.height(4.dp))
 
-        PopularityBadge(popularity = artist.popularity)
-
-        val size = ButtonDefaults.MediumContainerHeight
+        val size = ButtonDefaults.LargeContainerHeight
         Button(
-            onClick = { /* TODO: Handle Spotify link */ },
+            onClick = { onClick(artist.id) },
             modifier = Modifier.heightIn(size),
             contentPadding = ButtonDefaults.contentPaddingFor(size)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.spotify_small_logo_black),
                 contentDescription = null,
-                modifier = Modifier.size(ButtonDefaults.IconSize),
+                modifier = Modifier.size(ButtonDefaults.LargeIconSize),
             )
             Spacer(Modifier.size(ButtonDefaults.iconSpacingFor(size)))
-            Text("Open in Spotify")
+            Text("Open in Spotify", style = ButtonDefaults.textStyleFor(size))
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PopularityBadge(popularity: Int) {
-    Surface(
-        shape = RoundedCornerShape(50), // Pill shape
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        tonalElevation = 2.dp
+fun PopularityBadge(
+    popularity: Int,
+    modifier: Modifier = Modifier,
+    plainTooltipText: String = "Popularity Score"
+) {
+    TooltipBox(
+        modifier = modifier,
+        positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+            TooltipAnchorPosition.Above
+        ),
+        tooltip = {
+            PlainTooltip { Text(plainTooltipText) }
+        },
+        state = rememberTooltipState()
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+        Surface(
+            shape = RoundedCornerShape(50),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            tonalElevation = 2.dp
         ) {
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = "Popularity",
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "$popularity",
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.labelLarge
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Popularity",
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "$popularity",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
         }
     }
 }
