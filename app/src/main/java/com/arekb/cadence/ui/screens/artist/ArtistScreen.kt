@@ -35,7 +35,6 @@ import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
@@ -47,6 +46,7 @@ import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -58,6 +58,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
@@ -81,10 +82,13 @@ fun ArtistScreen(
     val uiState by viewModel.uiState.collectAsState()
     var selectedIndex by remember { mutableIntStateOf(0) }
 
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val exitAlwaysScrollBehavior =
         FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
 
-    Scaffold(
+    Scaffold(modifier = Modifier
+        .nestedScroll(scrollBehavior.nestedScrollConnection)
+        .nestedScroll(exitAlwaysScrollBehavior),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
@@ -95,12 +99,13 @@ fun ArtistScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
+                scrollBehavior = scrollBehavior,
             )
         }
-    ) { padding ->
+    ) { innerPadding ->
         Box(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             when {
@@ -115,7 +120,8 @@ fun ArtistScreen(
                         artist = uiState.artistDetails!!,
                         topTracks = uiState.topTracks,
                         albums = uiState.albums,
-                        selectedIndex = selectedIndex
+                        selectedIndex = selectedIndex,
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
@@ -125,13 +131,14 @@ fun ArtistScreen(
                 scrollBehavior = exitAlwaysScrollBehavior,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = -FloatingToolbarDefaults.ScreenOffset - 16.dp)
+                    .offset(y = -FloatingToolbarDefaults.ScreenOffset -16.dp)
             )
         }
     }
 }
 
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArtistDetailsContent(
     artist: TopArtistObject,
@@ -161,37 +168,29 @@ fun ArtistDetailsContent(
             }
         }
 
-        // CONDITIONAL CONTENT ---
+        // CONDITIONAL CONTENT
         when (selectedIndex) {
             0 -> {
                 item {
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
+                    Column {
                         Text(
-                            text = "Top Tracks",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
+                            text = "Popular",
+                            style = MaterialTheme.typography.titleLargeEmphasized,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                         )
-                        topTracks.forEach { track ->
-                            ListItem(
-                                headlineContent = {
-                                    Text(
-                                        track.name,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                },
-                                leadingContent = {
-                                    AsyncImage(
-                                        model = track.album.images.firstOrNull()?.url,
-                                        contentDescription = track.name,
-                                        modifier = Modifier
-                                            .size(56.dp)
-                                            .clip(MaterialTheme.shapes.small)
-                                    )
-                                }
+
+                        topTracks.forEachIndexed { index, track ->
+                            val itemShape = when (index) {
+                                0 -> RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
+                                9 -> RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
+                                else -> RoundedCornerShape(0.dp)
+                            }
+                            TrackListItem(
+                                track = track,
+                                rank = index + 1,
+                                itemShape = itemShape
                             )
                         }
                     }
@@ -226,7 +225,59 @@ fun ArtistDetailsContent(
     }
 }
 
+@Composable
+private fun TrackListItem(track: TrackObject, rank: Int, itemShape: RoundedCornerShape) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 2.dp)
+            .clip(itemShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
 
+        // Rank Number
+        Text(
+            text = "$rank",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.width(24.dp)
+        )
+
+        // Album Art
+        AsyncImage(
+            model = track.album.images.firstOrNull()?.url,
+            contentDescription = "Album art for ${track.name}",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Track Title and Artists
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = track.name,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = track.artists.joinToString(", ") { it.name },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+//TODO: REVAMP!
 @Composable
 private fun AlbumCard(album: SimpleAlbumObject) {
     Column(
@@ -254,7 +305,7 @@ private fun AlbumCard(album: SimpleAlbumObject) {
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ArtistViewToggleToolbar(
+private fun ArtistViewToggleToolbar(
     selectedIndex: Int,
     onSelectionChanged: (Int) -> Unit,
     scrollBehavior: FloatingToolbarScrollBehavior,
@@ -303,16 +354,19 @@ private fun ArtistHeader(artist: TopArtistObject) {
             Row(modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(8.dp),
-                verticalAlignment = Alignment.Bottom)
+                .padding(horizontal = 8.dp, vertical = 16.dp),
+                verticalAlignment = Alignment.CenterVertically)
             {
                 Text(
                     text = artist.name,
                     style = MaterialTheme.typography.headlineLargeEmphasized,
-                    color = MaterialTheme.colorScheme.surface,
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                PopularityBadge(popularity = artist.popularity)
+                Spacer(modifier = Modifier.width(16.dp))
+                PopularityBadge(popularity = artist.popularity, modifier = Modifier.padding(top = 2.dp))
             }
     }
 }
@@ -329,18 +383,18 @@ private fun OpenInSpotifyButton(
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
     ) {
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        val size = ButtonDefaults.LargeContainerHeight
+        val size = ButtonDefaults.MediumContainerHeight
         Button(
             onClick = { onClick(artist.id) },
-            modifier = Modifier.heightIn(size),
+            modifier = Modifier.heightIn(size).offset(y = -size / 2),
             contentPadding = ButtonDefaults.contentPaddingFor(size)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.spotify_small_logo_black),
                 contentDescription = null,
-                modifier = Modifier.size(ButtonDefaults.LargeIconSize),
+                modifier = Modifier.size(ButtonDefaults.MediumIconSize),
             )
             Spacer(Modifier.size(ButtonDefaults.iconSpacingFor(size)))
             Text("Open in Spotify", style = ButtonDefaults.textStyleFor(size))
@@ -350,7 +404,7 @@ private fun OpenInSpotifyButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PopularityBadge(
+private fun PopularityBadge(
     popularity: Int,
     modifier: Modifier = Modifier,
     plainTooltipText: String = "Popularity Score"

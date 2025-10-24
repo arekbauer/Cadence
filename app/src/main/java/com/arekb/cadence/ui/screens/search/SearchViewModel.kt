@@ -68,7 +68,6 @@ class SearchViewModel @Inject constructor(
     }
 
     fun onSuggestionClicked(artistName: String) {
-        // TODO: Take user to the artist screen straight away
         _searchQuery.value = artistName
     }
 
