@@ -310,7 +310,7 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
                 columns = GridCells.Adaptive(150.dp),
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(top = 4.dp, bottom = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(

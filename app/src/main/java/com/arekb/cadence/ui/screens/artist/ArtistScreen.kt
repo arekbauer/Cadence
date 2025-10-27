@@ -1,5 +1,12 @@
 package com.arekb.cadence.ui.screens.artist
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +24,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -148,74 +156,110 @@ fun ArtistDetailsContent(
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Artist Header + Open in Spotify Button
-        item {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                ArtistHeader(artist)
-                OpenInSpotifyButton(
-                    artist = artist,
-                    onClick = { artistId ->
-                        // Construct the Spotify artist URL and open it
-                        val spotifyUrl = "https://open.spotify.com/artist/$artistId"
-                        uriHandler.openUri(spotifyUrl)
-                    }
-                )
-            }
+    AnimatedContent(
+        targetState = selectedIndex,
+        label = "PageContentAnimation",
+        transitionSpec = {
+            val forward = targetState > initialState
+
+            val enterTransition = slideInHorizontally { width ->
+                if (forward) width else -width
+            } + fadeIn()
+
+            val exitTransition = slideOutHorizontally { width ->
+                if (forward) -width else width
+            } + fadeOut()
+
+            enterTransition.togetherWith(exitTransition).using(
+                SizeTransform(clip = false)
+            )
         }
-
-        // CONDITIONAL CONTENT
-        when (selectedIndex) {
-            0 -> {
-                item {
-                    Column {
-                        Text(
-                            text = "Popular",
-                            style = MaterialTheme.typography.titleLargeEmphasized,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-                        )
-
-                        topTracks.forEachIndexed { index, track ->
-                            val itemShape = when (index) {
-                                0 -> RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)
-                                9 -> RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
-                                else -> RoundedCornerShape(0.dp)
-                            }
-                            TrackListItem(
-                                track = track,
-                                rank = index + 1,
-                                itemShape = itemShape
+    ) { targetIndex ->
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            contentPadding = PaddingValues(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // CONDITIONAL CONTENT
+            when (targetIndex) {
+                0 -> {
+                    // Artist Header + Open in Spotify Button
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            ArtistHeader(artist)
+                            OpenInSpotifyButton(
+                                artist = artist,
+                                onClick = { artistId ->
+                                    // Construct the Spotify artist URL and open it
+                                    val spotifyUrl = "https://open.spotify.com/artist/$artistId"
+                                    uriHandler.openUri(spotifyUrl)
+                                }
                             )
                         }
                     }
-                }
-            }
+                    item {
+                        Column {
+                            Text(
+                                text = "Popular",
+                                style = MaterialTheme.typography.titleLargeEmphasized,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                            )
 
-            // --- ALBUMS CONTENT ---
-            1 -> {
-                item {
-                    Column(modifier = Modifier.padding(top = 16.dp)) {
+                            topTracks.forEachIndexed { index, track ->
+                                val itemShape = when (index) {
+                                    0 -> RoundedCornerShape(
+                                        topStart = 16.dp,
+                                        topEnd = 16.dp,
+                                        bottomStart = 0.dp,
+                                        bottomEnd = 0.dp
+                                    )
+
+                                    9 -> RoundedCornerShape(
+                                        topStart = 0.dp,
+                                        topEnd = 0.dp,
+                                        bottomStart = 16.dp,
+                                        bottomEnd = 16.dp
+                                    )
+
+                                    else -> RoundedCornerShape(0.dp)
+                                }
+                                TrackListItem(
+                                    track = track,
+                                    rank = index + 1,
+                                    itemShape = itemShape
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // --- ALBUMS CONTENT ---
+                1 -> {
+                    item {
                         Text(
                             text = "Albums",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLargeEmphasized,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(vertical = 8.dp, horizontal = 16.dp)
                         )
-                        // Using LazyRow inside an item is fine for horizontal lists.
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.fillParentMaxHeight(),
+                            contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(albums, key = { it.id }) { album ->
-                                AlbumCard(album)
+                                AlbumCard(album,
+                                    onClick = { albumId ->
+                                        // Construct the Spotify album URL and open it
+                                        val spotifyUrl = "https://open.spotify.com/album/$albumId"
+                                        uriHandler.openUri(spotifyUrl)
+                                    }
+                                )
                             }
                         }
                     }
@@ -225,6 +269,7 @@ fun ArtistDetailsContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun TrackListItem(track: TrackObject, rank: Int, itemShape: RoundedCornerShape) {
     Row(
@@ -262,13 +307,13 @@ private fun TrackListItem(track: TrackObject, rank: Int, itemShape: RoundedCorne
             Text(
                 text = track.name,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleSmallEmphasized,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = track.artists.joinToString(", ") { it.name },
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -277,14 +322,16 @@ private fun TrackListItem(track: TrackObject, rank: Int, itemShape: RoundedCorne
     }
 }
 
-//TODO: REVAMP!
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun AlbumCard(album: SimpleAlbumObject) {
+private fun AlbumCard(album: SimpleAlbumObject, onClick: (String) -> Unit) {
     Column(
         modifier = Modifier.width(150.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card {
+        Card(
+            onClick = {onClick(album.id)}
+        ) {
             AsyncImage(
                 model = album.images.firstOrNull()?.url,
                 contentDescription = album.name,
@@ -294,13 +341,24 @@ private fun AlbumCard(album: SimpleAlbumObject) {
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = album.name,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 2,
+            style = MaterialTheme.typography.titleSmallEmphasized,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center
         )
+        Spacer(modifier = Modifier.height(3.dp))
+        Text(
+            text = extractYearFromDate(album.releaseDate),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
+}
+
+/**
+ * A helper to safely extract the year from a date string (e.g., "2023-10-26").
+ */
+private fun extractYearFromDate(date: String): String {
+    return date.split("-").firstOrNull() ?: ""
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
