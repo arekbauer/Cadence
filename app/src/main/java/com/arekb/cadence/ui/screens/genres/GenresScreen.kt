@@ -254,12 +254,12 @@ private fun GenreBarChart(
 
     val animatedAlpha by animateFloatAsState(
         targetValue = if (isHighlighted) 1f else 0.5f,
-        animationSpec = springSpec, // Changed from tween
+        animationSpec = springSpec,
         label = "AlphaAnimation"
     )
     val animatedScale by animateFloatAsState(
         targetValue = if (isHighlighted) 1f else 0.9f,
-        animationSpec = springSpec, // Changed from tween
+        animationSpec = springSpec,
         label = "ScaleAnimation"
     )
 

@@ -15,6 +15,9 @@ Here's a quick preview of the progress so far. The app features a clean, express
   <img src=".github/assets/top_tracks.png" width="300">
   <img src=".github/assets/top_artists.png" width="300">
   <img src=".github/assets/top_genres.png" width="300">
+  <img src=".github/assets/search_screen.png" width="300">
+  <img src=".github/assets/artist_overview.png" width="300">
+  <img src=".github/assets/artist_albums.png" width="300">
 </p>  
 
 ## ✨ Features
@@ -89,6 +92,19 @@ Phase 2: User Analytics Features (✅ Complete)
 
     Popularity Score: Developing the logic to calculate and display the user's "mainstream vs. obscure" score.
 
-Phase 3: Music Library Exploration (In-Progress)
+Phase 3: Music Library Exploration (✅ Complete)
+
+    Artist Search: Use the Spotify SDK to search for artists. 
 
     Artist Pages: Creating dedicated pages to explore an artist's discography.
+
+Phase 4: Quality & Robustness (In progress...)
+
+    Comprehensive Testing: Write unit tests for ViewModels/repositories and UI tests to validate screen states and interactions, ensuring app stability.
+
+Phase 5: Engagement & Home Screen Integration (In progress...)
+
+    Stat Card Export: Develop a feature to generate and share a stylish summary image of the user's listening statistics on social media.
+
+    Home Screen Widget: Build a widget using the Glance API to display the user's current #1 top track or artist, increasing daily engagement.
+

@@ -61,7 +61,7 @@ class HomeViewModel @Inject constructor(
 
     private fun observeTopArtists() {
         viewModelScope.launch {
-            userRepository.getTopArtists("long_term", 50).collect { result ->
+            userRepository.getTopArtists("medium_term", 50).collect { result ->
                 result.fold(
                     onSuccess = { artists ->
                         val score = calculatePopularityScore(artists)

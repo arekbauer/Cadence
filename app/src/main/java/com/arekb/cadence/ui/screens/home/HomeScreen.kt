@@ -31,6 +31,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -71,6 +72,7 @@ fun HomeScreen(
     onNavigateToMyTopTracks: () -> Unit,
     onNavigateToMyTopArtists: () -> Unit,
     onNavigateToTopGenres: () -> Unit,
+    onNavigateToSearch: () -> Unit,
     onLogout: () -> Unit
 ){
     val uiState by viewModel.uiState.collectAsState()
@@ -92,7 +94,7 @@ fun HomeScreen(
         ){
             when {
                 uiState.isLoading -> {
-                    CircularWavyProgressIndicator()
+                    LoadingIndicator()
                 }
 
                 uiState.error != null -> {
@@ -144,7 +146,7 @@ fun HomeScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                                 ArtistSearchCard(
-                                    onSearchClicked = { /* Implement at a later date */ },
+                                    onSearchClicked = onNavigateToSearch,
                                     modifier = Modifier.padding(16.dp).weight(1f),
                                 )
                             }
@@ -382,7 +384,7 @@ fun LastPlayedSongCard(
 
                 // Spotify Logo
                 Icon(
-                    painter = painterResource(id = R.drawable.spotify_small_logo_black), // Replace with your drawable
+                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
                     contentDescription = "Spotify Logo",
                     modifier = Modifier.size(28.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -522,7 +524,7 @@ fun ArtistSearchCard(
                 painter = painterResource(id = R.drawable.spotify_small_logo_black),
                 contentDescription = "Spotify Logo",
                 modifier = Modifier.size(40.dp),
-                tint = Color.Unspecified
+                tint = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
