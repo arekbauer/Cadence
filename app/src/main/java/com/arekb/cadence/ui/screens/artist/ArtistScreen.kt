@@ -100,7 +100,7 @@ fun ArtistScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
-                    text = uiState.artistDetails?.name ?: "Artist",
+                    text = uiState.artistDetails?.name ?: "",
                     style = MaterialTheme.typography.titleLargeEmphasized)
                         },
                 navigationIcon = {

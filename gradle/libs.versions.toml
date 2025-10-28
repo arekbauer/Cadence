@@ -14,8 +14,9 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
 composeBom = "2025.07.00"
-material3Version = "1.5.0-alpha01"
+material3Version = "1.5.0-alpha07"
 materialIconsExtended = "1.7.8"
+navigationCompose = "2.9.5"
 pagingCompose = "3.3.6"
 retrofitVersion = "3.0.0"
 roomCompiler = "2.7.2"
@@ -32,6 +33,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-graphics-shapes = { module = "androidx.graphics:graphics-shapes", version.ref = "graphicsShapes" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-ktx = { module = "androidx.room:room-ktx" }
