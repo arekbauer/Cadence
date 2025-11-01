@@ -44,7 +44,13 @@ fun LoginScreen(
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Welcome to Cadence", style = MaterialTheme.typography.headlineMedium)
+            Text("Cadence", style = MaterialTheme.typography.displayLargeEmphasized)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Unlock your personal listening stats.",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(modifier = Modifier.height(32.dp))
 
             if (uiState.isLoading) {

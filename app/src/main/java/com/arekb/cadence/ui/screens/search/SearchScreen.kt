@@ -1,16 +1,11 @@
 package com.arekb.cadence.ui.screens.search
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,14 +50,10 @@ import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -86,13 +77,13 @@ import com.arekb.cadence.data.remote.paging.SearchResult
 fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
     onNavigateToArtist: (String) -> Unit,
+    onNavigateToAlbum: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val query by viewModel.searchQuery.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()
     val searchResults = viewModel.searchResults.collectAsLazyPagingItems()
 
-    var isSearchActive by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     Scaffold(
@@ -116,10 +107,7 @@ fun SearchScreen(
             ExpressiveSearchTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .onFocusChanged { focusState ->
-                        isSearchActive = focusState.isFocused
-                    },
+                    .padding(vertical = 8.dp),
                 value = query,
                 onValueChange = viewModel::onQueryChanged,
                 placeholder = { Text("Search artists and albums...") },
@@ -127,35 +115,29 @@ fun SearchScreen(
                     focusManager.clearFocus()
                 })
             )
-            AnimatedVisibility(
-                visible = isSearchActive,
-                enter = fadeIn(animationSpec = tween(200)) + slideInVertically(),
-                exit = fadeOut(animationSpec = tween(200)) + slideOutVertically()
+            val filters = SearchFilter.entries.toTypedArray()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
             ) {
-                val filters = SearchFilter.entries.toTypedArray()
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                ) {
-                    filters.forEachIndexed { index, filter ->
-                        ToggleButton(
-                            checked = filter == selectedFilter,
-                            onCheckedChange = { viewModel.onFilterSelected(filter) },
-                            modifier = Modifier.weight(1f),
-                            shapes = when (index) {
-                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                filters.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            }
-                        ) {
-                            Icon(
-                                imageVector = filter.icon,
-                                contentDescription = filter.name,
-                                modifier = Modifier.size(ToggleButtonDefaults.IconSize)
-                            )
-                            Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
-                            Text(filter.name)
+                filters.forEachIndexed { index, filter ->
+                    ToggleButton(
+                        checked = filter == selectedFilter,
+                        onCheckedChange = { viewModel.onFilterSelected(filter) },
+                        modifier = Modifier.weight(1f),
+                        shapes = when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            filters.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                         }
+                    ) {
+                        Icon(
+                            imageVector = filter.icon,
+                            contentDescription = filter.name,
+                            modifier = Modifier.size(ToggleButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+                        Text(filter.name)
                     }
                 }
             }
@@ -165,7 +147,11 @@ fun SearchScreen(
             if (query.isBlank()) {
                 IdleSearchPrompt(modifier = Modifier.weight(1f))
             } else {
-                SearchResultsGrid(pagingItems = searchResults, onArtistClick = onNavigateToArtist)
+                SearchResultsGrid(
+                    pagingItems = searchResults,
+                    onArtistClick = onNavigateToArtist,
+                    onAlbumClick = onNavigateToAlbum
+                )
             }
         }
     }
@@ -291,8 +277,9 @@ fun ExpressiveSearchTextField(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
-                      onArtistClick: (String) -> Unit)
-{
+                      onArtistClick: (String) -> Unit,
+                      onAlbumClick: (String) -> Unit
+){
     // Handle the initial loading state for the whole screen
     when (val state = pagingItems.loadState.refresh) {
         is LoadState.Loading -> {
@@ -321,7 +308,16 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
                     if (result != null) {
                         GridSearchResultItem(
                             result = result,
-                            onClick = { onArtistClick(result.id) },
+                            onClick = {
+                                when (result.subtitle) {
+                                    "Artist" -> {
+                                        onArtistClick(result.id)
+                                    }
+                                    "Album" -> {
+                                        onAlbumClick(result.id)
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -354,7 +350,7 @@ fun GridSearchResultItem(
     onClick: () -> Unit,
 ) {
     Card(
-        onClick = if (result.subtitle == "Artist") onClick else ({}),
+        onClick = onClick,
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
     ) {
