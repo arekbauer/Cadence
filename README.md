@@ -11,13 +11,8 @@ Cadence is a modern Android application built to explore personal Spotify listen
 Built with Material 3 Expressive, Cadence offers a clean and expressive interface, enhanced by dynamic animations for an intuitive feel.
 
 <p align="center">
-  <img src=".github/assets/home_screen.png" width="300">
-  <img src=".github/assets/top_tracks.png" width="300">
-  <img src=".github/assets/top_artists.png" width="300">
-  <img src=".github/assets/top_genres.png" width="300">
-  <img src=".github/assets/search_screen.png" width="300">
-  <img src=".github/assets/artist_overview.png" width="300">
-  <img src=".github/assets/artist_albums.png" width="300">
+  <img src=".github/assets/collage-1.jpg" width="900">
+  <img src=".github/assets/collage-2.jpg" width="900">
 </p>  
 
 ## ✨ Features
