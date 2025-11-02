@@ -1,8 +1,5 @@
 package com.arekb.cadence.ui
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -11,8 +8,9 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,6 +36,30 @@ fun AppNavigation(
 ) {
     val navController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()
+    val uriHandler = LocalUriHandler.current
+
+    // Animations
+    val animationSpec = tween<IntOffset>(durationMillis = 300)
+
+    val slideIn = slideInHorizontally(
+        initialOffsetX = { fullWidth -> fullWidth },
+        animationSpec = animationSpec
+    )
+
+    val slideOut = slideOutHorizontally(
+        targetOffsetX = { fullWidth -> -fullWidth },
+        animationSpec = animationSpec
+    )
+
+    val popIn = slideInHorizontally(
+        initialOffsetX = { fullWidth -> -fullWidth },
+        animationSpec = animationSpec
+    )
+
+    val popOut = slideOutHorizontally(
+        targetOffsetX = { fullWidth -> fullWidth },
+        animationSpec = animationSpec
+    )
 
     // Check the login state asynchronously
     LaunchedEffect(key1 = Unit) {
@@ -105,20 +127,6 @@ fun AppNavigation(
             )
         }
 
-        // All detail/sub-screens use a standard slide animation
-        val standardSlide: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) = {
-            slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = tween(300))
-        }
-        val standardPopExit: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) = {
-            slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300))
-        }
-        val standardExit: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition) = {
-            slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = tween(300))
-        }
-        val standardPopEnter: (AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition) = {
-            slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = tween(300))
-        }
-
         composable("top_tracks") {
             TopTracksScreen(
                 onNavigateBack = {
@@ -145,6 +153,10 @@ fun AppNavigation(
                 onNavigateToArtist = { artistId ->
                     navController.navigate("artist/$artistId")
                 },
+                onNavigateToAlbum = { albumId ->
+                    val spotifyUrl = "https://open.spotify.com/album/$albumId"
+                    uriHandler.openUri(spotifyUrl)
+                },
                 onNavigateBack = {
                     navController.navigateUp()
                 }
@@ -153,10 +165,10 @@ fun AppNavigation(
         composable(
             route = "artist/{artistId}",
             arguments = listOf(navArgument("artistId") { type = NavType.StringType }),
-            enterTransition = standardSlide,
-            exitTransition = standardExit,
-            popEnterTransition = standardPopEnter,
-            popExitTransition = standardPopExit
+            enterTransition = { slideIn },
+            exitTransition = { slideOut },
+            popEnterTransition = { popIn },
+            popExitTransition = { popOut }
         ) {
             ArtistScreen(
                 onNavigateBack = {
