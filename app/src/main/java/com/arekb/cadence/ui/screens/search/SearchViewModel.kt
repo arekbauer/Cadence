@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.arekb.cadence.core.model.Artist
-import com.arekb.cadence.data.remote.paging.SearchResult
+import com.arekb.cadence.core.model.SearchResult
 import com.arekb.cadence.data.repository.SearchRepository
 import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -13,8 +13,11 @@ import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
 import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
+import com.arekb.cadence.data.remote.dto.AlbumSearchDto
 import com.arekb.cadence.data.remote.dto.ArtistObject
 import com.arekb.cadence.data.remote.dto.ImageObject
+import com.arekb.cadence.data.remote.dto.SimpleAlbumObject
+import com.arekb.cadence.data.remote.dto.TopArtistObject
 import com.arekb.cadence.data.remote.dto.TrackObject
 import com.arekb.cadence.data.remote.dto.UserProfile
 
@@ -110,5 +113,42 @@ fun NewReleasesEntity.asDomainModel(): Album {
         releaseDate = this.releaseDate,
         // Entity only has "artistName" string. Wrap it in a list.
         artists = listOf(Artist(id = "", name = this.artistName, imageUrl = null))
+    )
+}
+
+fun AlbumSearchDto.asDomainModel(): Album {
+    return Album(
+        id = this.id,
+        name = this.name,
+        imageUrl = this.images.asUrl(),
+        // Defaults for missing fields in search results
+        albumType = "album",
+        totalTracks = 0,
+        releaseDate = "",
+        artists = emptyList()
+    )
+}
+
+// 2. Map the "Rich" Album from Artist Page
+fun SimpleAlbumObject.asDomainModel(): Album {
+    return Album(
+        id = this.id,
+        name = this.name,
+        imageUrl = this.images.asUrl(),
+        albumType = this.albumType,
+        totalTracks = this.totalTracks,
+        releaseDate = this.releaseDate,
+        artists = this.artists.map { it.asDomainModel() }
+    )
+}
+
+// 3. Map the Artist from Search/Top Artists
+fun TopArtistObject.asDomainModel(): Artist {
+    return Artist(
+        id = this.id,
+        name = this.name,
+        imageUrl = this.images.asUrl(),
+        genres = this.genres,
+        popularity = this.popularity
     )
 }

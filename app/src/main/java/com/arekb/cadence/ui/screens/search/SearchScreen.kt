@@ -70,7 +70,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.arekb.cadence.R
-import com.arekb.cadence.data.remote.paging.SearchResult
+import com.arekb.cadence.core.model.SearchResult
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -302,23 +302,46 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
             ) {
                 items(
                     count = pagingItems.itemCount,
-                    key = { index -> pagingItems.peek(index)?.id ?: index }
+                    key = { index ->
+                        when (val item = pagingItems.peek(index)) {
+                            is SearchResult.ArtistItem -> "artist_${item.artist.id}"
+                            is SearchResult.AlbumItem -> "album_${item.album.id}"
+                            is SearchResult.TrackItem -> "track_${item.track.id}"
+                            null -> index
+                        }
+                    }
                 ) { index ->
                     val result = pagingItems[index]
+
                     if (result != null) {
-                        GridSearchResultItem(
-                            result = result,
-                            onClick = {
-                                when (result.subtitle) {
-                                    "Artist" -> {
-                                        onArtistClick(result.id)
-                                    }
-                                    "Album" -> {
-                                        onAlbumClick(result.id)
-                                    }
-                                }
+                        // FIX 2: Unwrap the Sealed Interface
+                        when (result) {
+                            is SearchResult.ArtistItem -> {
+                                GridSearchResultItem(
+                                    title = result.artist.name,
+                                    subtitle = "Artist",
+                                    imageUrl = result.artist.imageUrl,
+                                    onClick = { onArtistClick(result.artist.id) }
+                                )
                             }
-                        )
+                            is SearchResult.AlbumItem -> {
+                                GridSearchResultItem(
+                                    title = result.album.name,
+                                    subtitle = "Album",
+                                    imageUrl = result.album.imageUrl,
+                                    onClick = { onAlbumClick(result.album.id) }
+                                )
+                            }
+                            is SearchResult.TrackItem -> {
+                                // If you choose to show tracks here later
+                                GridSearchResultItem(
+                                    title = result.track.name,
+                                    subtitle = "Track",
+                                    imageUrl = result.track.albumImageUrl,
+                                    onClick = { /* Handle track click */ }
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -346,7 +369,9 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun GridSearchResultItem(
-    result: SearchResult,
+    title: String,
+    subtitle: String,
+    imageUrl: String?,
     onClick: () -> Unit,
 ) {
     Card(
@@ -356,8 +381,8 @@ fun GridSearchResultItem(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             AsyncImage(
-                model = result.imageUrl,
-                contentDescription = "Image for ${result.title}",
+                model = imageUrl,
+                contentDescription = "Image for $title",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .padding(8.dp)
@@ -371,7 +396,7 @@ fun GridSearchResultItem(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = result.title,
+                    text = title,
                     style = MaterialTheme.typography.titleMediumEmphasized,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -380,7 +405,7 @@ fun GridSearchResultItem(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = result.subtitle,
+                    text = subtitle,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,

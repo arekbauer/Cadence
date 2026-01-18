@@ -2,7 +2,9 @@ package com.arekb.cadence.data.remote.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.arekb.cadence.core.model.SearchResult
 import com.arekb.cadence.data.remote.api.SpotifyApiService
+import com.arekb.cadence.mappers.asDomainModel
 
 class SearchPagingSource(
     private val spotifyApiService: SpotifyApiService,
@@ -29,22 +31,23 @@ class SearchPagingSource(
 
             // Map the different DTO types to the single SearchResult domain model
             val results = mutableListOf<SearchResult>()
-            response.artists?.items?.mapTo(results) { artist ->
-                SearchResult(artist.id, artist.images.firstOrNull()?.url, artist.name, "Artist")
+            response.artists?.items?.map { dto ->
+                results.add(SearchResult.ArtistItem(dto.asDomainModel()))
             }
-            response.albums?.items?.mapTo(results) { album ->
-                SearchResult(album.id, album.images?.firstOrNull()?.url, album.name, "Album")
+            response.albums?.items?.map { dto ->
+                results.add(SearchResult.AlbumItem(dto.asDomainModel()))
+            }
+
+            val nextKey = if (response.artists?.next != null || response.albums?.next != null) {
+                offset + params.loadSize
+            } else {
+                null
             }
 
             LoadResult.Page(
                 data = results,
                 prevKey = if (offset == 0) null else offset - params.loadSize,
-                // If 'next' is null, we've reached the end of the data
-                nextKey = if (response.artists?.next != null || response.albums?.next != null) {
-                    offset + params.loadSize
-                } else {
-                    null
-                }
+                nextKey = nextKey
             )
         } catch (e: Exception) {
             LoadResult.Error(e)
@@ -64,12 +67,3 @@ class SearchPagingSource(
     }
 
 }
-
-
-// A single, unified data class that the UI will use
-data class SearchResult(
-    val id: String,
-    val imageUrl: String?,
-    val title: String,
-    val subtitle: String
-)

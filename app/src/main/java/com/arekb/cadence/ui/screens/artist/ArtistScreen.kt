@@ -77,9 +77,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.arekb.cadence.R
-import com.arekb.cadence.data.remote.dto.SimpleAlbumObject
-import com.arekb.cadence.data.remote.dto.TopArtistObject
-import com.arekb.cadence.data.remote.dto.TrackObject
+import com.arekb.cadence.core.model.Album
+import com.arekb.cadence.core.model.Artist
+import com.arekb.cadence.core.model.Track
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -149,9 +149,9 @@ fun ArtistScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArtistDetailsContent(
-    artist: TopArtistObject,
-    topTracks: List<TrackObject>,
-    albums: List<SimpleAlbumObject>,
+    artist: Artist,
+    topTracks: List<Track>,
+    albums: List<Album>,
     selectedIndex: Int,
     modifier: Modifier = Modifier
 ) {
@@ -271,7 +271,7 @@ fun ArtistDetailsContent(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun TrackListItem(track: TrackObject, rank: Int, itemShape: RoundedCornerShape) {
+private fun TrackListItem(track: Track, rank: Int, itemShape: RoundedCornerShape) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -292,7 +292,7 @@ private fun TrackListItem(track: TrackObject, rank: Int, itemShape: RoundedCorne
 
         // Album Art
         AsyncImage(
-            model = track.album.images.firstOrNull()?.url,
+            model = track.albumImageUrl,
             contentDescription = "Album art for ${track.name}",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -324,7 +324,7 @@ private fun TrackListItem(track: TrackObject, rank: Int, itemShape: RoundedCorne
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun AlbumCard(album: SimpleAlbumObject, onClick: (String) -> Unit) {
+private fun AlbumCard(album: Album, onClick: (String) -> Unit) {
     Column(
         modifier = Modifier.width(150.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -333,7 +333,7 @@ private fun AlbumCard(album: SimpleAlbumObject, onClick: (String) -> Unit) {
             onClick = {onClick(album.id)}
         ) {
             AsyncImage(
-                model = album.images.firstOrNull()?.url,
+                model = album.imageUrl,
                 contentDescription = album.name,
                 modifier = Modifier.aspectRatio(1f)
             )
@@ -392,14 +392,14 @@ private fun ArtistViewToggleToolbar(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun ArtistHeader(artist: TopArtistObject) {
+private fun ArtistHeader(artist: Artist) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
     ) {
         AsyncImage(
-            model = artist.images.firstOrNull()?.url,
+            model = artist.imageUrl,
             contentDescription = "Image for ${artist.name}",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -424,7 +424,7 @@ private fun ArtistHeader(artist: TopArtistObject) {
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                PopularityBadge(popularity = artist.popularity, modifier = Modifier.padding(top = 2.dp))
+                PopularityBadge(popularity = artist.popularity?: 0, modifier = Modifier.padding(top = 2.dp))
             }
     }
 }
@@ -432,7 +432,7 @@ private fun ArtistHeader(artist: TopArtistObject) {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun OpenInSpotifyButton(
-    artist: TopArtistObject,
+    artist: Artist,
     onClick : (String) -> Unit
 ){
     Column(
