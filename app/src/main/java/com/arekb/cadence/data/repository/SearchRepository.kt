@@ -3,16 +3,8 @@ package com.arekb.cadence.data.repository
 import androidx.paging.PagingData
 import com.arekb.cadence.core.model.ArtistDetails
 import com.arekb.cadence.core.model.SearchResult
-import com.arekb.cadence.data.remote.dto.ArtistAlbumsResponse
-import com.arekb.cadence.data.remote.dto.ArtistTopTracksResponse
-import com.arekb.cadence.data.remote.dto.TopArtistObject
 import kotlinx.coroutines.flow.Flow
 
-data class ArtistPageData(
-    val details: TopArtistObject?,
-    val topTracks: ArtistTopTracksResponse?,
-    val albums: ArtistAlbumsResponse?
-)
 
 interface SearchRepository {
 
