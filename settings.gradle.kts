@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Cadence"
 include(":app")
- 
+include(":core:model")
