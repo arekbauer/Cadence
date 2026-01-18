@@ -16,11 +16,12 @@ android {
     defaultConfig {
         manifestPlaceholders += mapOf(
             "redirectSchemeName" to "cadence-app",
-            "redirectHostName" to "callback"
+            "redirectHostName" to "callback",
+            "redirectPathPattern" to ".*"
         )
         applicationId = "com.arekb.cadence"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -90,17 +91,18 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
 
     // Spotify
     //noinspection UseTomlInstead
-    implementation("com.spotify.android:auth:2.1.2")
+    implementation("com.spotify.android:auth:3.0.0")
 
     // Retrofit
     implementation(libs.retrofit.v2110)
     implementation(libs.converter.gson)
     //noinspection UseTomlInstead
     implementation("io.coil-kt:coil-compose:2.7.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.1.0")
+    implementation(libs.logging.interceptor)
 
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.datastore.preferences)
