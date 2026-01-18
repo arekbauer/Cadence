@@ -1,6 +1,6 @@
-package com.arekb.cadence.data.remote.api
+package com.arekb.cadence.core.network.api
 
-import com.arekb.cadence.data.local.TokenManager
+import com.arekb.cadence.core.network.auth.TokenManager
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response

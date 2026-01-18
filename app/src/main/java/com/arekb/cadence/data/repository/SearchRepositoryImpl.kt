@@ -5,9 +5,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.arekb.cadence.core.model.ArtistDetails
 import com.arekb.cadence.core.model.SearchResult
-import com.arekb.cadence.data.remote.api.SpotifyApiService
-import com.arekb.cadence.data.remote.paging.SearchPagingSource
-import com.arekb.cadence.mappers.asDomainModel
+import com.arekb.cadence.core.network.api.SpotifyApiService
+import com.arekb.cadence.core.network.mappers.asDomainModel
+import com.arekb.cadence.core.network.paging.SearchPagingSource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow

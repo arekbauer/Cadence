@@ -4,6 +4,8 @@ import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.core.model.User
+import com.arekb.cadence.core.network.api.SpotifyApiService
+import com.arekb.cadence.core.network.mappers.asDomainModel
 import com.arekb.cadence.data.local.database.dao.NewReleasesDao
 import com.arekb.cadence.data.local.database.dao.TopArtistsDao
 import com.arekb.cadence.data.local.database.dao.TopTracksDao
@@ -12,7 +14,6 @@ import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
 import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
 import com.arekb.cadence.data.local.database.entity.TopTracksEntity
 import com.arekb.cadence.data.local.database.entity.UserProfileEntity
-import com.arekb.cadence.data.remote.api.SpotifyApiService
 import com.arekb.cadence.mappers.asDomainModel
 import com.arekb.cadence.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
@@ -254,7 +255,6 @@ class UserRepositoryImpl @Inject constructor(
                 }
             },
             shouldFetch = { cachedReleases ->
-                // ... (Keep existing fetch logic) ...
                 if (cachedReleases.isNullOrEmpty()) true
                 else (System.currentTimeMillis() - cachedReleases.first().lastFetched > CACHE_EXPIRATION_MS_NEW_RELEASES)
             }

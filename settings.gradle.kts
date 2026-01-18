@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 rootProject.name = "Cadence"
 include(":app")
 include(":core:model")
+include(":core:network")

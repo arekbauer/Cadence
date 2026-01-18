@@ -112,4 +112,5 @@ dependencies {
 
     // Modularization
     implementation(project(":core:model"))
+    implementation(project(":core:network"))
 }

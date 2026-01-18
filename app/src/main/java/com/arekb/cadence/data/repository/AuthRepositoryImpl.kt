@@ -1,8 +1,8 @@
 package com.arekb.cadence.data.repository
 
 import com.arekb.cadence.BuildConfig
-import com.arekb.cadence.data.local.TokenManager
-import com.arekb.cadence.data.remote.api.SpotifyAuthApiService
+import com.arekb.cadence.core.network.api.SpotifyAuthApiService
+import com.arekb.cadence.core.network.auth.TokenManager
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import java.util.Base64

@@ -1,4 +1,4 @@
-package com.arekb.cadence.data.remote.dto
+package com.arekb.cadence.core.network.dto
 
 import com.google.gson.annotations.SerializedName
 

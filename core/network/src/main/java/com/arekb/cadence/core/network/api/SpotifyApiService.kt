@@ -1,14 +1,14 @@
-package com.arekb.cadence.data.remote.api
+package com.arekb.cadence.core.network.api
 
-import com.arekb.cadence.data.remote.dto.ArtistAlbumsResponse
-import com.arekb.cadence.data.remote.dto.ArtistTopTracksResponse
-import com.arekb.cadence.data.remote.dto.NewReleasesResponse
-import com.arekb.cadence.data.remote.dto.RecentlyPlayedResponse
-import com.arekb.cadence.data.remote.dto.SearchResponseDto
-import com.arekb.cadence.data.remote.dto.TopArtistObject
-import com.arekb.cadence.data.remote.dto.TopArtistResponse
-import com.arekb.cadence.data.remote.dto.TopItemsResponse
-import com.arekb.cadence.data.remote.dto.UserProfile
+import com.arekb.cadence.core.network.dto.ArtistAlbumsResponse
+import com.arekb.cadence.core.network.dto.ArtistTopTracksResponse
+import com.arekb.cadence.core.network.dto.NewReleasesResponse
+import com.arekb.cadence.core.network.dto.RecentlyPlayedResponse
+import com.arekb.cadence.core.network.dto.SearchResponseDto
+import com.arekb.cadence.core.network.dto.TopArtistObject
+import com.arekb.cadence.core.network.dto.TopArtistResponse
+import com.arekb.cadence.core.network.dto.TopItemsResponse
+import com.arekb.cadence.core.network.dto.UserProfile
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

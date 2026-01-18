@@ -1,6 +1,6 @@
-package com.arekb.cadence.data.remote.api
+package com.arekb.cadence.core.network.api
 
-import com.arekb.cadence.data.remote.dto.TokenResponse
+import com.arekb.cadence.core.network.dto.TokenResponse
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

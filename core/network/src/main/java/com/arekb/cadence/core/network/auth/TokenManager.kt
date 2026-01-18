@@ -1,4 +1,4 @@
-package com.arekb.cadence.data.local
+package com.arekb.cadence.core.network.auth
 
 import android.content.Context
 import androidx.datastore.core.DataStore

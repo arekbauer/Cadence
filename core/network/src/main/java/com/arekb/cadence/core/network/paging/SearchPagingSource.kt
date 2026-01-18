@@ -1,10 +1,10 @@
-package com.arekb.cadence.data.remote.paging
+package com.arekb.cadence.core.network.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.arekb.cadence.core.model.SearchResult
-import com.arekb.cadence.data.remote.api.SpotifyApiService
-import com.arekb.cadence.mappers.asDomainModel
+import com.arekb.cadence.core.network.api.SpotifyApiService
+import com.arekb.cadence.core.network.mappers.asDomainModel
 
 class SearchPagingSource(
     private val spotifyApiService: SpotifyApiService,
@@ -15,7 +15,7 @@ class SearchPagingSource(
     /**
      * Loads the next page of data from the Spotify API.
      * @param params The parameters for the load operation.
-     * @return A [LoadResult] containing the loaded data and metadata.
+     * @return A [androidx.paging.PagingSource.LoadResult] containing the loaded data and metadata.
      */
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, SearchResult> {
         // The current page is the key, or 0 if it's the first load
