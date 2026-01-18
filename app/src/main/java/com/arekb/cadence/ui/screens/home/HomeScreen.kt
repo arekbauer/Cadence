@@ -62,8 +62,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.arekb.cadence.R
-import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
-import com.arekb.cadence.data.remote.dto.PlayHistoryObject
+import com.arekb.cadence.core.model.Album
+import com.arekb.cadence.core.model.Track
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -323,7 +323,7 @@ private fun AnalyticsNavButton(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LastPlayedSongCard(
-    item: PlayHistoryObject,
+    item: Track,
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
@@ -342,8 +342,8 @@ fun LastPlayedSongCard(
             ) {
                 // Album Art
                 AsyncImage(
-                    model = item.track.album.images.firstOrNull()?.url,
-                    contentDescription = "Album art for ${item.track.name}",
+                    model = item.albumImageUrl,
+                    contentDescription = "Album art for ${item.name}",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(68.dp)
@@ -364,7 +364,7 @@ fun LastPlayedSongCard(
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        text = item.track.name,
+                        text = item.name,
                         style = MaterialTheme.typography.titleMediumEmphasized,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -372,7 +372,7 @@ fun LastPlayedSongCard(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = item.track.artists.joinToString(", ") { it.name },
+                        text = item.artists.joinToString(", ") { it.name },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
@@ -540,7 +540,7 @@ fun ArtistSearchCard(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun NewReleasesCarousel(
-    releases: List<NewReleasesEntity>,
+    releases: List<Album>,
     modifier: Modifier = Modifier,
     onAlbumClick: (String) -> Unit
 ) {
@@ -619,7 +619,7 @@ fun NewReleasesCarousel(
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                text = release.artistName,
+                                text = release.artists.joinToString(", "),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = Color.White.copy(alpha = 0.9f),
                                 maxLines = 1,

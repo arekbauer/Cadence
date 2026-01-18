@@ -68,6 +68,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.arekb.cadence.core.model.Artist
+import com.arekb.cadence.core.model.Genre
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.pow
@@ -95,7 +97,7 @@ fun GenresScreen(
         }
     }
 
-    val selectedGenre = if (centerItemIndex != -1) uiState.topGenresWithArtists.getOrNull(centerItemIndex) else null
+    val selectedGenre = if (centerItemIndex != -1) uiState.topGenres.getOrNull(centerItemIndex) else null
 
     Scaffold(
         topBar = {
@@ -124,7 +126,7 @@ fun GenresScreen(
                     Text(text = uiState.error!!)
                 }
                 else -> {
-                    val genres = uiState.topGenresWithArtists.take(NUMBER_OF_GENRES)
+                    val genres = uiState.topGenres.take(NUMBER_OF_GENRES)
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -134,13 +136,11 @@ fun GenresScreen(
                             val itemWidth = this.maxWidth * 0.30f
                             val horizontalPadding = (this.maxWidth - itemWidth) / 2
 
-                            val maxCount =
-                                remember(uiState.topGenresWithArtists.take(NUMBER_OF_GENRES)) {
-                                    // Get the boosted value of the highest count
-                                    uiState.topGenresWithArtists.maxOfOrNull { it.count }?.toFloat()
-                                        ?.pow(0.75f)
-                                        ?: 1f
-                                }
+                            val maxCount = remember(uiState.topGenres.take(NUMBER_OF_GENRES)) {
+                                uiState.topGenres.maxOfOrNull { it.artistCount }?.toFloat()
+                                    ?.pow(0.75f)
+                                    ?: 1f
+                            }
 
                             LazyRow(
                                 state = lazyListState,
@@ -149,7 +149,7 @@ fun GenresScreen(
                                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                                 flingBehavior = rememberSnapFlingBehavior(lazyListState = lazyListState)
                             ) {
-                                itemsIndexed(uiState.topGenresWithArtists.take(NUMBER_OF_GENRES)) { index, genre ->
+                                itemsIndexed(uiState.topGenres.take(NUMBER_OF_GENRES)) { index, genre ->
                                     GenreBarChart(
                                         modifier = Modifier.width(itemWidth),
                                         genre = genre,
@@ -208,7 +208,7 @@ fun GenresScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun GenreControlRow(
-    selectedGenre: GenreWithArtists?,
+    selectedGenre: Genre?,
     centerItemIndex: Int,
     genreCount: Int,
     onPrevious: () -> Unit,
@@ -244,7 +244,7 @@ private fun GenreControlRow(
 @Composable
 private fun GenreBarChart(
     modifier: Modifier = Modifier,
-    genre: GenreWithArtists,
+    genre: Genre,
     isHighlighted: Boolean,
     maxCount: Float,
     index: Int,
@@ -273,7 +273,7 @@ private fun GenreBarChart(
     ) {
         GenreBar(
             modifier = Modifier.fillMaxWidth(0.8f),
-            count = genre.count,
+            count = genre.artistCount,
             maxCount = maxCount,
             rank = index,
             isHighlighted = isHighlighted,
@@ -331,7 +331,7 @@ private fun GenreBar(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ArtistGrid(genre: GenreWithArtists) {
+fun ArtistGrid(genre: Genre) {
     var itemsVisible by remember(genre) { mutableStateOf(false) }
 
     LaunchedEffect(genre) {

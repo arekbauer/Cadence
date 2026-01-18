@@ -175,10 +175,10 @@ fun TopTracksScreen(
                                     item {
                                         val topTrack = uiState.topTracks.first()
                                         TopStatHeroCard(
-                                            rank = topTrack.rank,
-                                            name = topTrack.trackName,
-                                            artistNames = topTrack.artistNames,
-                                            imageUrl = topTrack.imageUrl
+                                            rank = 1,
+                                            name = topTrack.name,
+                                            artistNames = topTrack.artists.joinToString(separator = ", ") { it.name },
+                                            imageUrl = topTrack.albumImageUrl
                                         )
                                         Spacer(modifier = Modifier.height(16.dp))
                                     }
@@ -191,19 +191,19 @@ fun TopTracksScreen(
                                             val secondTrack = uiState.topTracks[1]
                                             val thirdTrack = uiState.topTracks[2]
                                             ThreeTwoCard(
-                                                rank = secondTrack.rank,
-                                                imageUrl = secondTrack.imageUrl,
-                                                name = secondTrack.trackName,
-                                                artistNames = secondTrack.artistNames,
+                                                rank = 2,
+                                                imageUrl = secondTrack.albumImageUrl,
+                                                name = secondTrack.name,
+                                                artistNames = secondTrack.artists.joinToString(separator = ", ") { it.name },
                                                 shape = MaterialShapes.Cookie7Sided.toShape(),
                                                 Modifier.weight(1f)
                                             )
                                             Spacer(modifier = Modifier.width(16.dp))
                                             ThreeTwoCard(
-                                                rank = thirdTrack.rank,
-                                                imageUrl = thirdTrack.imageUrl,
-                                                name = thirdTrack.trackName,
-                                                artistNames = thirdTrack.artistNames,
+                                                rank = 3,
+                                                imageUrl = thirdTrack.albumImageUrl,
+                                                name = thirdTrack.name,
+                                                artistNames = thirdTrack.artists.joinToString(separator = ", ") { it.name },
                                                 shape = MaterialShapes.Sunny.toShape(),
                                                 Modifier.weight(1f)
                                             )
@@ -214,9 +214,9 @@ fun TopTracksScreen(
                                 itemsIndexed(uiState.topTracks.drop(3)) { index, track ->
                                     StatRow(
                                         rank = index + 4,
-                                        name = track.trackName,
-                                        artistNames = track.artistNames,
-                                        imageUrl = track.imageUrl
+                                        name = track.name,
+                                        artistNames = track.artists.joinToString(separator = ", ") { it.name },
+                                        imageUrl = track.albumImageUrl
                                     )
                                 }
                             }

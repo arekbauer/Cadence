@@ -2,10 +2,10 @@ package com.arekb.cadence.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
-import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
-import com.arekb.cadence.data.local.database.entity.UserProfileEntity
-import com.arekb.cadence.data.remote.dto.PlayHistoryObject
+import com.arekb.cadence.core.model.Album
+import com.arekb.cadence.core.model.Artist
+import com.arekb.cadence.core.model.Track
+import com.arekb.cadence.core.model.User
 import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -100,7 +100,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun calculatePopularityScore(artists: List<TopArtistsEntity>?): Int? {
+    private fun calculatePopularityScore(artists: List<Artist>?): Int? {
         if (artists.isNullOrEmpty()) return null
 
         val maxWeight = artists.size
@@ -109,7 +109,7 @@ class HomeViewModel @Inject constructor(
 
         val weightedPopularitySum = artists.withIndex().sumOf { (index, artist) ->
             val weight = maxWeight - index
-            (artist.popularity * weight).toDouble()
+            ((artist.popularity ?: 0) * weight).toDouble()
         }
 
         return (weightedPopularitySum / totalWeight).toInt()
@@ -120,10 +120,10 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUiState(
     val isLoading: Boolean = true,
-    val userProfile: UserProfileEntity? = null,
-    val recentlyPlayed: List<PlayHistoryObject> = emptyList(),
+    val userProfile: User? = null,
+    val recentlyPlayed: List<Track> = emptyList(),
     val popularityScore: Int? = null,
-    val newReleases: List<NewReleasesEntity> = emptyList(),
+    val newReleases: List<Album> = emptyList(),
     val error: String? = null
 )
 

@@ -176,7 +176,7 @@ fun TopArtistsScreen(
                                         val topArtist = uiState.topArtists.first()
                                         TopStatHeroCard(
                                             rank = 1,
-                                            name = topArtist.artistName,
+                                            name = topArtist.name,
                                             artistNames = null,
                                             imageUrl = topArtist.imageUrl
                                         )
@@ -191,18 +191,18 @@ fun TopArtistsScreen(
                                             val secondArtist = uiState.topArtists[1]
                                             val thirdArtist = uiState.topArtists[2]
                                             ThreeTwoCard(
-                                                rank = secondArtist.rank,
+                                                rank = 2,
                                                 imageUrl = secondArtist.imageUrl,
-                                                name = secondArtist.artistName,
+                                                name = secondArtist.name,
                                                 artistNames = null,
                                                 shape = MaterialShapes.Cookie7Sided.toShape(),
                                                 Modifier.weight(1f)
                                             )
                                             Spacer(modifier = Modifier.width(16.dp))
                                             ThreeTwoCard(
-                                                rank = thirdArtist.rank,
+                                                rank = 3,
                                                 imageUrl = thirdArtist.imageUrl,
-                                                name = thirdArtist.artistName,
+                                                name = thirdArtist.name,
                                                 artistNames = null,
                                                 shape = MaterialShapes.Sunny.toShape(),
                                                 Modifier.weight(1f)
@@ -214,7 +214,7 @@ fun TopArtistsScreen(
                                 itemsIndexed(uiState.topArtists.drop(3)) { index, artist ->
                                     StatRow(
                                         rank = index + 4,
-                                        name = artist.artistName,
+                                        name = artist.name,
                                         artistNames = null,
                                         imageUrl = artist.imageUrl
                                     )

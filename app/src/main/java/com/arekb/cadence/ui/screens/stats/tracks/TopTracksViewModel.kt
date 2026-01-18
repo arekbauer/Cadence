@@ -2,7 +2,7 @@ package com.arekb.cadence.ui.screens.stats.tracks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.arekb.cadence.data.local.database.entity.TopTracksEntity
+import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -66,6 +66,6 @@ class StatsViewModel @Inject constructor(
 
 data class StatsUiState(
     val isLoading: Boolean = true,
-    val topTracks: List<TopTracksEntity> = emptyList(),
+    val topTracks: List<Track> = emptyList(),
     val error: String? = null
 )

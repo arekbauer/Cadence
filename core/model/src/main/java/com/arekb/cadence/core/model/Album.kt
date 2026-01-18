@@ -7,5 +7,5 @@ data class Album(
     val totalTracks: Int,
     val imageUrl: String?,
     val releaseDate: String,
-    val artist: List<Artist>
+    val artists: List<Artist>
 )

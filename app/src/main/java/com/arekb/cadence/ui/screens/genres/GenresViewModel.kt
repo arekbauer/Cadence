@@ -2,6 +2,8 @@ package com.arekb.cadence.ui.screens.genres
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arekb.cadence.core.model.Artist
+import com.arekb.cadence.core.model.Genre
 import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,23 +32,20 @@ class GenresViewModel @Inject constructor(
                         } else {
                             val genreToArtistsMap = mutableMapOf<String, MutableList<Artist>>()
 
-                            artists.forEach { artistEntity ->
-                                val genres = artistEntity.genres.split(", ").filter { it.isNotBlank() && it != "Unknown" }
-                                genres.forEach { genre ->
-                                    val artist = Artist(name = artistEntity.artistName, imageUrl = artistEntity.imageUrl)
+                            artists.forEach { artist ->
+                                artist.genres.forEach { genre ->
                                     genreToArtistsMap.getOrPut(genre) { mutableListOf() }.add(artist)
                                 }
                             }
 
                             val rankedGenres = genreToArtistsMap.map { (genreName, artistList) ->
-                                GenreWithArtists(
+                                Genre(
                                     name = genreName,
-                                    count = artistList.size,
                                     artists = artistList
                                 )
-                            }.sortedByDescending { it.count }
+                            }.sortedByDescending { it.artistCount }
 
-                            AnalyticsUiState(isLoading = false, topGenresWithArtists = rankedGenres)
+                            AnalyticsUiState(isLoading = false, topGenres = rankedGenres)
                         }
                     },
                     onFailure = {
@@ -64,22 +63,11 @@ class GenresViewModel @Inject constructor(
 /**
  * The UI state for the Analytics screen.
  * @param isLoading True if the initial data is being loaded.
- * @param topGenresWithArtists A list of genres with their corresponding artists.
+ * @param topGenres A list of genres with their corresponding artists.
  * @param error An error message if something went wrong.
  */
 data class AnalyticsUiState(
     val isLoading: Boolean = true,
-    val topGenresWithArtists: List<GenreWithArtists> = emptyList(),
+    val topGenres: List<Genre> = emptyList(),
     val error: String? = null
-)
-
-data class Artist(
-    val name: String,
-    val imageUrl: String?
-)
-
-data class GenreWithArtists(
-    val name: String,
-    val count: Int,
-    val artists: List<Artist>
 )

@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
+import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.data.remote.paging.SearchResult
 import com.arekb.cadence.data.repository.SearchRepository
 import com.arekb.cadence.data.repository.UserRepository
@@ -47,8 +47,8 @@ class SearchViewModel @Inject constructor(
     private val _selectedFilter = MutableStateFlow(SearchFilter.BOTH)
     val selectedFilter: StateFlow<SearchFilter> = _selectedFilter.asStateFlow()
 
-    private val _artistSuggestions = MutableStateFlow<List<TopArtistsEntity>>(emptyList())
-    val artistSuggestions: StateFlow<List<TopArtistsEntity>> = _artistSuggestions.asStateFlow()
+    private val _artistSuggestions = MutableStateFlow<List<Artist>>(emptyList())
+    val artistSuggestions: StateFlow<List<Artist>> = _artistSuggestions.asStateFlow()
 
     init {
         // Fetch the suggestions when the ViewModel is created.
