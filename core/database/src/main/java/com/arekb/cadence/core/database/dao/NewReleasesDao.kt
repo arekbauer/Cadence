@@ -1,10 +1,10 @@
-package com.arekb.cadence.data.local.database.dao
+package com.arekb.cadence.core.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
+import com.arekb.cadence.core.database.entity.NewReleasesEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

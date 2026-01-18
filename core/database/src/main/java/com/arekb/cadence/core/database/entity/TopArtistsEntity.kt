@@ -1,4 +1,4 @@
-package com.arekb.cadence.data.local.database.entity
+package com.arekb.cadence.core.database.entity
 
 import androidx.room.Entity
 

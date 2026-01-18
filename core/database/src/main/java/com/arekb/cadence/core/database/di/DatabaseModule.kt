@@ -1,8 +1,8 @@
-package com.arekb.cadence.di
+package com.arekb.cadence.core.database.di
 
 import android.content.Context
 import androidx.room.Room
-import com.arekb.cadence.data.local.database.AppDatabase
+import com.arekb.cadence.core.database.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

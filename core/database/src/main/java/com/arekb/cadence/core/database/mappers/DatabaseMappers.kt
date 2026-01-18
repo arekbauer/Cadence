@@ -1,13 +1,13 @@
-package com.arekb.cadence.mappers
+package com.arekb.cadence.core.database.mappers
 
+import com.arekb.cadence.core.database.entity.NewReleasesEntity
+import com.arekb.cadence.core.database.entity.TopArtistsEntity
+import com.arekb.cadence.core.database.entity.TopTracksEntity
+import com.arekb.cadence.core.database.entity.UserProfileEntity
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.core.model.User
-import com.arekb.cadence.data.local.database.entity.NewReleasesEntity
-import com.arekb.cadence.data.local.database.entity.TopArtistsEntity
-import com.arekb.cadence.data.local.database.entity.TopTracksEntity
-import com.arekb.cadence.data.local.database.entity.UserProfileEntity
 
 fun TopTracksEntity.asDomainModel(): Track {
     val stubArtists = this.artistNames.split(", ").map { name ->

@@ -1,6 +1,3 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -9,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.arekb.cadence.core.network"
+    namespace = "com.arekb.cadence.core.database"
     compileSdk {
         version = release(36)
     }
@@ -20,19 +17,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
 
-        // Grabbing my private keys
-        val localProperties = Properties()
-        val localPropertiesFile = rootProject.file("local.properties")
-        localProperties.load(FileInputStream(localPropertiesFile))
-
-        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${localProperties.getProperty("SPOTIFY_CLIENT_ID")}\"")
-        buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"${localProperties.getProperty("SPOTIFY_CLIENT_SECRET")}\"")
-        buildConfigField("String", "SPOTIFY_BASE_URL", "\"https://api.spotify.com/v1/\"")
-        buildConfigField("String", "SPOTIFY_AUTH_URL", "\"https://accounts.spotify.com/\"")
-    }
-
-    buildFeatures {
-        buildConfig = true
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "$projectDir/schemas"
+            }
+        }
     }
 
     buildTypes {
@@ -63,21 +52,14 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    // Dependency on the Model module
     implementation(project(":core:model"))
 
-    // Retrofit & Gson (Network)
-    implementation(libs.retrofit.v2110)
-    implementation(libs.converter.gson)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.logging.interceptor)
+    // 2. Room (Database)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
-    // Paging
-    implementation(libs.androidx.paging.common)
-    implementation(libs.androidx.paging.compose)
-
-    // Hilt
+    // 3. Hilt (Dependency Injection)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
-
 }
