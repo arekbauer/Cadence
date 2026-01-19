@@ -16,14 +16,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.arekb.cadence.core.data.repository.AuthRepository
+import com.arekb.cadence.feature.analytics.artists.TopArtistsScreen
+import com.arekb.cadence.feature.analytics.genres.GenresScreen
+import com.arekb.cadence.feature.analytics.tracks.TopTracksScreen
 import com.arekb.cadence.feature.home.HomeScreen
 import com.arekb.cadence.ui.screens.artist.ArtistScreen
-import com.arekb.cadence.ui.screens.genres.GenresScreen
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
 import com.arekb.cadence.ui.screens.search.SearchScreen
-import com.arekb.cadence.ui.screens.stats.artists.TopArtistsScreen
-import com.arekb.cadence.ui.screens.stats.tracks.TopTracksScreen
 import kotlinx.coroutines.launch
 
 @Composable

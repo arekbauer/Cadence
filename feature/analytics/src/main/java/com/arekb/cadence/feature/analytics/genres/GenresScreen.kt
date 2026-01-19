@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.genres
+package com.arekb.cadence.feature.analytics.genres
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -41,7 +41,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -71,6 +70,7 @@ import coil.compose.AsyncImage
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Genre
 import com.arekb.cadence.core.ui.component.CadenceErrorState
+import com.arekb.cadence.feature.analytics.components.AnalyticsTopBar
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.pow
@@ -102,15 +102,10 @@ fun GenresScreen(
 
     Scaffold(
         topBar = {
-            LargeFlexibleTopAppBar(
-                title = { Text("Your Top Genres") },
-                subtitle = {
-                    Text(text = "Past 12 Months", maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
+            AnalyticsTopBar(
+                title = "Your Top Genres",
+                subtitle = "Past 12 Months",
+                onNavigateBack = onNavigateBack
             )
         }
     ) { innerPadding ->

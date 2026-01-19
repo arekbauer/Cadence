@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialShapes
@@ -41,7 +40,6 @@ import coil.compose.AsyncImage
 fun StatsTimeRangeToolbar(
     selectedIndex: Int,
     onSelectionChanged: (Int) -> Unit,
-    scrollBehavior: FloatingToolbarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
     val options = listOf("4 Weeks", "6 Months", "12 Months")
@@ -49,7 +47,6 @@ fun StatsTimeRangeToolbar(
     HorizontalFloatingToolbar(
         modifier = modifier,
         expanded = true,
-        scrollBehavior = scrollBehavior,
         content = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 options.forEachIndexed { index, label ->

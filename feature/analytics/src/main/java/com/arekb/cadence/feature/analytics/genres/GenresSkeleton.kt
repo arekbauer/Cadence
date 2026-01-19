@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.genres
+package com.arekb.cadence.feature.analytics.genres
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

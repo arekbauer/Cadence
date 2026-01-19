@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.stats.tracks
+package com.arekb.cadence.feature.analytics.tracks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

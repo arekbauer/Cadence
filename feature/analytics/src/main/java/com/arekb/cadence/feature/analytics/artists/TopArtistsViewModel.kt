@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.stats.artists
+package com.arekb.cadence.feature.analytics.artists
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.genres
+package com.arekb.cadence.feature.analytics.genres
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
