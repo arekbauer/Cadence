@@ -1,11 +1,11 @@
-package com.arekb.cadence.di
+package com.arekb.cadence.core.data.di
 
-import com.arekb.cadence.data.repository.AuthRepository
-import com.arekb.cadence.data.repository.AuthRepositoryImpl
-import com.arekb.cadence.data.repository.SearchRepository
-import com.arekb.cadence.data.repository.SearchRepositoryImpl
-import com.arekb.cadence.data.repository.UserRepository
-import com.arekb.cadence.data.repository.UserRepositoryImpl
+import com.arekb.cadence.core.data.repository.AuthRepository
+import com.arekb.cadence.core.data.repository.AuthRepositoryImpl
+import com.arekb.cadence.core.data.repository.SearchRepository
+import com.arekb.cadence.core.data.repository.SearchRepositoryImpl
+import com.arekb.cadence.core.data.repository.UserRepository
+import com.arekb.cadence.core.data.repository.UserRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,7 +14,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AppModule {
+abstract class RepositoryModule {
 
     @Binds
     @Singleton

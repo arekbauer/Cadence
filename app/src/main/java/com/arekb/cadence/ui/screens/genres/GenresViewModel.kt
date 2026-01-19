@@ -2,9 +2,9 @@ package com.arekb.cadence.ui.screens.genres
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arekb.cadence.core.data.repository.UserRepository
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Genre
-import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

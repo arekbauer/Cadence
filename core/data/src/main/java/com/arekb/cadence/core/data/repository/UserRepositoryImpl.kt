@@ -1,5 +1,6 @@
-package com.arekb.cadence.data.repository
+package com.arekb.cadence.core.data.repository
 
+import com.arekb.cadence.core.data.util.networkBoundResource
 import com.arekb.cadence.core.database.dao.NewReleasesDao
 import com.arekb.cadence.core.database.dao.TopArtistsDao
 import com.arekb.cadence.core.database.dao.TopTracksDao
@@ -15,7 +16,6 @@ import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.core.model.User
 import com.arekb.cadence.core.network.api.SpotifyApiService
 import com.arekb.cadence.core.network.mappers.asDomainModel
-import com.arekb.cadence.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit

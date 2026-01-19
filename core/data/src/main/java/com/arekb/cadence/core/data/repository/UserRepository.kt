@@ -1,4 +1,4 @@
-package com.arekb.cadence.data.repository
+package com.arekb.cadence.core.data.repository
 
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist

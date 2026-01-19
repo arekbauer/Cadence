@@ -7,14 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.arekb.cadence.data.repository.AuthRepository
+import com.arekb.cadence.core.data.repository.AuthRepository
 import com.arekb.cadence.ui.AppNavigation
 import com.arekb.cadence.ui.screens.login.LoginViewModel
 import com.arekb.cadence.ui.theme.CadenceTheme

@@ -16,7 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.arekb.cadence.data.repository.AuthRepository
+import com.arekb.cadence.core.data.repository.AuthRepository
 import com.arekb.cadence.ui.screens.artist.ArtistScreen
 import com.arekb.cadence.ui.screens.genres.GenresScreen
 import com.arekb.cadence.ui.screens.home.HomeScreen

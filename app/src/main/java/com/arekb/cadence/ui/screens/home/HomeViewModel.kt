@@ -2,11 +2,11 @@ package com.arekb.cadence.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arekb.cadence.core.data.repository.UserRepository
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.core.model.User
-import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

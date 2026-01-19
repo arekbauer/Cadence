@@ -1,4 +1,4 @@
-package com.arekb.cadence.util
+package com.arekb.cadence.core.data.util
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -13,7 +13,7 @@ import retrofit2.Response
  * @param ResultType The type of the data returned by the resource.
  * @param RequestType The type of the data fetched from the network.
  * @param query A function that returns a [Flow] of data from the local database.
- * @param fetch A suspend function that makes a network request and returns a [Response].
+ * @param fetch A suspend function that makes a network request and returns a [retrofit2.Response].
  * @param saveFetchResult A suspend function that saves the result of the network request to the local database.
  * @param shouldFetch A function that decides whether to fetch new data from the network.
  * @return A [Flow] of [Result] that emits data from the local database and/or the network.

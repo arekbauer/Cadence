@@ -1,6 +1,3 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -26,16 +23,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // Grabbing my private keys
-        val localProperties = Properties()
-        val localPropertiesFile = rootProject.file("local.properties")
-        localProperties.load(FileInputStream(localPropertiesFile))
-
-        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${localProperties.getProperty("SPOTIFY_CLIENT_ID")}\"")
-        buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"${localProperties.getProperty("SPOTIFY_CLIENT_SECRET")}\"")
-
-        // Spotify callback URI
     }
 
     buildTypes {
@@ -96,22 +83,9 @@ dependencies {
     //noinspection UseTomlInstead
     implementation("com.spotify.android:auth:3.0.0")
 
-    // Retrofit
-    implementation(libs.retrofit.v2110)
-    implementation(libs.converter.gson)
-    //noinspection UseTomlInstead
-    implementation("io.coil-kt:coil-compose:2.7.0")
-    implementation(libs.logging.interceptor)
-
-    implementation(libs.androidx.security.crypto)
-    implementation(libs.androidx.datastore.preferences)
-
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.androidx.room.compiler)
+    implementation(libs.coil.compose)
 
     // Modularization
     implementation(project(":core:model"))
-    implementation(project(":core:network"))
-    implementation(project(":core:database"))
+    implementation(project(":core:data"))
 }

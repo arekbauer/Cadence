@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.arekb.cadence.core.data.repository.SearchRepository
+import com.arekb.cadence.core.data.repository.UserRepository
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.SearchResult
-import com.arekb.cadence.data.repository.SearchRepository
-import com.arekb.cadence.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

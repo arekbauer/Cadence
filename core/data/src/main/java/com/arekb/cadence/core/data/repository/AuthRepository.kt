@@ -1,4 +1,4 @@
-package com.arekb.cadence.data.repository
+package com.arekb.cadence.core.data.repository
 
 import com.spotify.sdk.android.auth.AuthorizationRequest
 
@@ -13,7 +13,7 @@ interface AuthRepository {
      * This request contains the necessary parameters for Spotify to identify the application
      * and request the correct permissions from the user.
      *
-     * @return An [AuthorizationRequest] object to be used with the Spotify SDK.
+     * @return An [com.spotify.sdk.android.auth.AuthorizationRequest] object to be used with the Spotify SDK.
      */
     fun getAuthorizationRequest(): AuthorizationRequest
 
