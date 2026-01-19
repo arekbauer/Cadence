@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.search
+package com.arekb.cadence.feature.search
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Album

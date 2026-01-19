@@ -20,10 +20,10 @@ import com.arekb.cadence.feature.analytics.artists.TopArtistsScreen
 import com.arekb.cadence.feature.analytics.genres.GenresScreen
 import com.arekb.cadence.feature.analytics.tracks.TopTracksScreen
 import com.arekb.cadence.feature.home.HomeScreen
+import com.arekb.cadence.feature.search.SearchScreen
 import com.arekb.cadence.ui.screens.artist.ArtistScreen
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
-import com.arekb.cadence.ui.screens.search.SearchScreen
 import kotlinx.coroutines.launch
 
 @Composable

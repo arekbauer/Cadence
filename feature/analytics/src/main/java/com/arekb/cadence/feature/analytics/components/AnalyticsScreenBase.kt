@@ -112,7 +112,7 @@ fun GenericAnalyticsScreen(
                 }
             ) { _ ->
                 when {
-                    isLoading || (items.isEmpty() && error == null) -> {
+                    isLoading || (items.isEmpty()) -> {
                         StatsScreenSkeleton()
                     }
                     error != null -> {

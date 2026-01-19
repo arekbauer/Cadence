@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.search
+package com.arekb.cadence.feature.search
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -69,8 +69,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.model.SearchResult
+import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.ui.component.CadenceErrorState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -315,7 +315,7 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
                     val result = pagingItems[index]
 
                     if (result != null) {
-                        // FIX 2: Unwrap the Sealed Interface
+                        // Unwrap the Sealed Interface
                         when (result) {
                             is SearchResult.ArtistItem -> {
                                 GridSearchResultItem(
