@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.artist
+package com.arekb.cadence.feature.artist
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

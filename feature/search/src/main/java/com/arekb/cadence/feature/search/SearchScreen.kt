@@ -378,7 +378,10 @@ fun GridSearchResultItem(
     Card(
         onClick = onClick,
         shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             AsyncImage(

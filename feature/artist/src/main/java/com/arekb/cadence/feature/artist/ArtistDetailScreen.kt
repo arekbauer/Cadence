@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.artist
+package com.arekb.cadence.feature.artist
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -38,8 +38,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
-import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,10 +73,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Track
+import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.ui.component.CadenceErrorState
 import com.arekb.cadence.core.ui.component.CadenceLoader
 
@@ -92,12 +90,10 @@ fun ArtistScreen(
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val exitAlwaysScrollBehavior =
-        FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
 
-    Scaffold(modifier = Modifier
-        .nestedScroll(scrollBehavior.nestedScrollConnection)
-        .nestedScroll(exitAlwaysScrollBehavior),
+    Scaffold(
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
@@ -111,10 +107,12 @@ fun ArtistScreen(
                 },
                 scrollBehavior = scrollBehavior,
             )
-        }
+        },
     ) { innerPadding ->
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
             when {
@@ -131,18 +129,16 @@ fun ArtistScreen(
                         artist = uiState.artistDetails!!,
                         topTracks = uiState.topTracks,
                         albums = uiState.albums,
-                        selectedIndex = selectedIndex,
-                        modifier = Modifier.padding(innerPadding)
+                        selectedIndex = selectedIndex
                     )
                 }
             }
             ArtistViewToggleToolbar(
                 selectedIndex = selectedIndex,
                 onSelectionChanged = { newIndex -> selectedIndex = newIndex },
-                scrollBehavior = exitAlwaysScrollBehavior,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .offset(y = -FloatingToolbarDefaults.ScreenOffset -16.dp)
+                    .padding(bottom = FloatingToolbarDefaults.ScreenOffset)
             )
         }
     }
@@ -180,7 +176,7 @@ fun ArtistDetailsContent(
     ) { targetIndex ->
         LazyColumn(
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(),
+            contentPadding = PaddingValues(bottom = 96.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // CONDITIONAL CONTENT
@@ -281,7 +277,7 @@ private fun TrackListItem(track: Track, rank: Int, itemShape: RoundedCornerShape
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 2.dp)
             .clip(itemShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
 
@@ -369,7 +365,6 @@ private fun extractYearFromDate(date: String): String {
 private fun ArtistViewToggleToolbar(
     selectedIndex: Int,
     onSelectionChanged: (Int) -> Unit,
-    scrollBehavior: FloatingToolbarScrollBehavior,
     modifier: Modifier = Modifier
 ) {
     val options = listOf("Overview", "Albums")
@@ -377,7 +372,6 @@ private fun ArtistViewToggleToolbar(
     HorizontalFloatingToolbar(
         modifier = modifier,
         expanded = true,
-        scrollBehavior = scrollBehavior,
         content = {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             options.forEachIndexed { index, label ->

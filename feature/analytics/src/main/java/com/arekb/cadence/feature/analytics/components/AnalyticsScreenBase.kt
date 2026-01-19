@@ -55,7 +55,6 @@ import com.arekb.cadence.core.ui.component.skeleton.StatsScreenSkeleton
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun GenericAnalyticsScreen(
-    // Data State
     items: List<RankedItem>,
     isLoading: Boolean,
     error: String?,
@@ -151,7 +150,7 @@ private fun RankedListContent(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = listState,
-        contentPadding = PaddingValues(top = 4.dp, start = 16.dp, end = 16.dp, bottom = 100.dp)
+        contentPadding = PaddingValues(top = 4.dp, start = 16.dp, end = 16.dp, bottom = 96.dp)
     ) {
         if (items.isNotEmpty()) {
             // Rank #1
