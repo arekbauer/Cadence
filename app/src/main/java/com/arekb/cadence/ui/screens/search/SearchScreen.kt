@@ -69,7 +69,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.arekb.cadence.R
+import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.model.SearchResult
 import com.arekb.cadence.core.ui.component.CadenceErrorState
 

@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.arekb.cadence.R
+import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.ui.component.CadenceErrorState
 
 //TODO: REVAMP!

@@ -10,17 +10,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.IntOffset
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.arekb.cadence.core.data.repository.AuthRepository
+import com.arekb.cadence.feature.home.HomeScreen
 import com.arekb.cadence.ui.screens.artist.ArtistScreen
 import com.arekb.cadence.ui.screens.genres.GenresScreen
-import com.arekb.cadence.ui.screens.home.HomeScreen
-import com.arekb.cadence.ui.screens.home.HomeViewModel
 import com.arekb.cadence.ui.screens.login.LoginScreen
 import com.arekb.cadence.ui.screens.login.LoginViewModel
 import com.arekb.cadence.ui.screens.search.SearchScreen
@@ -104,9 +102,7 @@ fun AppNavigation(
                 slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = tween(300))
             }
         ) {
-            val homeViewModel: HomeViewModel = hiltViewModel()
             HomeScreen(
-                viewModel = homeViewModel,
                 onNavigateToMyTopTracks = {
                     navController.navigate("top_tracks")
                 },
@@ -121,7 +117,7 @@ fun AppNavigation(
                 },
                 onLogout = {
                     navController.navigate("login") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             )

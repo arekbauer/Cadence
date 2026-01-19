@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.home
+package com.arekb.cadence.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

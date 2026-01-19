@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.home
+package com.arekb.cadence.feature.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,15 +31,11 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,125 +45,16 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.arekb.cadence.R
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Track
-import com.arekb.cadence.core.ui.component.CadenceErrorState
-import com.arekb.cadence.core.ui.component.CadenceLoader
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToMyTopTracks: () -> Unit,
-    onNavigateToMyTopArtists: () -> Unit,
-    onNavigateToTopGenres: () -> Unit,
-    onNavigateToSearch: () -> Unit,
-    onLogout: () -> Unit
-){
-    val uiState by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
-            when (event) {
-                is HomeViewEvent.NavigateToLogin -> onLogout()
-            }
-        }
-    }
-
-    Scaffold { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ){
-            when {
-                uiState.isLoading -> {
-                    CadenceLoader()
-                }
-
-                uiState.error != null -> {
-                    CadenceErrorState(
-                        message = "Error loading profile",
-                        onRetry = viewModel::onRetry,
-                    )
-                }
-
-                uiState.userProfile != null -> {
-                    val uriHandler = LocalUriHandler.current
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 48.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        item {
-                            WelcomeRow(
-                                displayName = uiState.userProfile!!.displayName,
-                                avatarUrl = uiState.userProfile!!.imageUrl,
-                            )
-                        }
-                        item {
-                            if (uiState.recentlyPlayed.isNotEmpty()) {
-                                LastPlayedSongCard(item = uiState.recentlyPlayed.first())
-                            } else {
-                                EmptyLastPlayedCard()
-                            }
-                        }
-                        item {
-                            AnalyticsHubCard(
-                                modifier = Modifier.padding(16.dp),
-                                onNavigateToTopTracks = onNavigateToMyTopTracks,
-                                onNavigateToTopArtists = onNavigateToMyTopArtists,
-                                onNavigateToTopGenres = onNavigateToTopGenres
-                            )
-                        }
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                PopularityScoreCard(
-                                    score = uiState.popularityScore,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                ArtistSearchCard(
-                                    onSearchClicked = onNavigateToSearch,
-                                    modifier = Modifier.padding(16.dp).weight(1f),
-                                )
-                            }
-                        }
-                        if (uiState.newReleases.isNotEmpty()) {
-                            item {
-                                Spacer(modifier = Modifier.height(16.dp))
-                                NewReleasesCarousel(
-                                    releases = uiState.newReleases,
-                                    onAlbumClick = { albumId ->
-                                        // Construct the Spotify album URL and open it
-                                        val spotifyUrl = "https://open.spotify.com/album/$albumId"
-                                        uriHandler.openUri(spotifyUrl)
-                                    }
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+import com.arekb.cadence.core.ui.R
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -200,7 +86,7 @@ fun WelcomeRow(
                 .data(avatarUrl)
                 .crossfade(true)
                 .build(),
-            placeholder = painterResource(R.drawable.spotify_small_logo_black),
+            placeholder = painterResource(com.arekb.cadence.core.ui.R.drawable.spotify_small_logo_black),
             contentDescription = "User Profile Picture",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -382,7 +268,7 @@ fun LastPlayedSongCard(
 
                 // Spotify Logo
                 Icon(
-                    painter = painterResource(id = R.drawable.spotify_small_logo_black),
+                    painter = painterResource(id = com.arekb.cadence.core.ui.R.drawable.spotify_small_logo_black),
                     contentDescription = "Spotify Logo",
                     modifier = Modifier.size(28.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -519,7 +405,7 @@ fun ArtistSearchCard(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.spotify_small_logo_black),
+                painter = painterResource(id = com.arekb.cadence.core.ui.R.drawable.spotify_small_logo_black),
                 contentDescription = "Spotify Logo",
                 modifier = Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.onSurface
@@ -617,7 +503,7 @@ fun NewReleasesCarousel(
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                text = release.artists.joinToString(", "),
+                                text = release.artists.joinToString(", ") { it.name },
                                 style = MaterialTheme.typography.labelMedium,
                                 color = Color.White.copy(alpha = 0.9f),
                                 maxLines = 1,

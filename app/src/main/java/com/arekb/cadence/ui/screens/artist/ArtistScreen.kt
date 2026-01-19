@@ -75,7 +75,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
-import com.arekb.cadence.R
+import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Track
