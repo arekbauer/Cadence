@@ -1,0 +1,35 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Build the App
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # Run Lint Checks
+      - name: Run Lint
+        run: ./gradlew lintDebug
+
+      # Run Unit Tests
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
