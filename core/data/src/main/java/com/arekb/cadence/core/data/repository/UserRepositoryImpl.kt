@@ -12,6 +12,7 @@ import com.arekb.cadence.core.database.entity.UserProfileEntity
 import com.arekb.cadence.core.database.mappers.asDomainModel
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
+import com.arekb.cadence.core.model.Genre
 import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.core.model.User
 import com.arekb.cadence.core.network.api.SpotifyApiService
@@ -262,6 +263,46 @@ class UserRepositoryImpl @Inject constructor(
         return resourceFlow.map { result ->
             result.map { list ->
                 list?.map { it.asDomainModel() }
+            }
+        }
+    }
+
+    override fun getTopGenresStream(): Flow<Result<List<Genre>>> {
+        // Reuse the existing single source of truth
+        return getTopArtists(timeRange = "long_term", limit = 50).map { result ->
+            result.map { artists ->
+                // This is the logic we moved from the ViewModel
+                val genreMap = mutableMapOf<String, MutableList<Artist>>()
+
+                artists?.forEach { artist ->
+                    artist.genres.forEach { genreName ->
+                        genreMap.getOrPut(genreName) { mutableListOf() }.add(artist)
+                    }
+                }
+
+                genreMap.map { (name, artistList) ->
+                    Genre(name = name, artists = artistList)
+                }.sortedByDescending { it.artistCount }
+            }
+        }
+    }
+
+    override fun getUserPopularityScore(timeRange: String): Flow<Result<Int>> {
+        return getTopArtists(timeRange, 50).map { result ->
+            result.map { artists ->
+                if (artists.isNullOrEmpty()) return@map 0
+
+                val maxWeight = artists.size
+                val totalWeight = (maxWeight * (maxWeight + 1)) / 2.0
+
+                if (totalWeight == 0.0) return@map 0
+
+                val weightedSum = artists.withIndex().sumOf { (index, artist) ->
+                    val weight = maxWeight - index
+                    ((artist.popularity ?: 0) * weight).toDouble()
+                }
+
+                (weightedSum / totalWeight).toInt()
             }
         }
     }

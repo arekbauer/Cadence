@@ -2,6 +2,7 @@ package com.arekb.cadence.core.data.repository
 
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
+import com.arekb.cadence.core.model.Genre
 import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.core.model.User
 import kotlinx.coroutines.flow.Flow
@@ -57,4 +58,18 @@ interface UserRepository {
      * @return A [Flow] of [Result] containing the new album releases.
      */
     fun getNewReleases(limit: Int): Flow<Result<List<Album>?>>
+
+    /**
+     * Get the user's top genres based on their top artists.
+     * Derived from the 'long_term' top artists.
+     * @return A [Flow] of [Result] containing the user's top genres.
+     */
+    fun getTopGenresStream(): Flow<Result<List<Genre>>>
+
+    /**
+     * Retrieves the user's popularity score based on their top tracks.
+     * @param timeRange The time range to fetch tracks for.
+     * @return A [Flow] of [Result] containing the user's popularity score.
+     */
+    fun getUserPopularityScore(timeRange: String = "medium_term"): Flow<Result<Int>>
 }

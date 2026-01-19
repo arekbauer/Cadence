@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arekb.cadence.core.data.repository.UserRepository
 import com.arekb.cadence.core.model.Album
-import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Track
 import com.arekb.cadence.core.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +36,7 @@ class HomeViewModel @Inject constructor(
 
         // Launch all the observers. They will run concurrently.
         observeProfile()
-        observeTopArtists()
+        observePopularityScore()
         observeNewReleases()
         fetchRecentlyPlayed()
     }
@@ -53,22 +52,6 @@ class HomeViewModel @Inject constructor(
                     },
                     onFailure = { error ->
                         _uiState.update { it.copy(isLoading = false, error = "Failed to load profile: ${error.message}") }
-                    }
-                )
-            }
-        }
-    }
-
-    private fun observeTopArtists() {
-        viewModelScope.launch {
-            userRepository.getTopArtists("medium_term", 50).collect { result ->
-                result.fold(
-                    onSuccess = { artists ->
-                        val score = calculatePopularityScore(artists)
-                        _uiState.update { it.copy(popularityScore = score) }
-                    },
-                    onFailure = { error ->
-                        _uiState.update { it.copy(error = "Failed to calculate score: ${error.message}") }
                     }
                 )
             }
@@ -100,19 +83,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun calculatePopularityScore(artists: List<Artist>?): Int? {
-        if (artists.isNullOrEmpty()) return null
-
-        val maxWeight = artists.size
-        val totalWeight = (maxWeight * (maxWeight + 1)) / 2.0
-        if (totalWeight == 0.0) return 0
-
-        val weightedPopularitySum = artists.withIndex().sumOf { (index, artist) ->
-            val weight = maxWeight - index
-            ((artist.popularity ?: 0) * weight).toDouble()
+    private fun observePopularityScore() {
+        viewModelScope.launch {
+            userRepository.getUserPopularityScore().collect { result ->
+                result.onSuccess { score ->
+                    _uiState.update { it.copy(popularityScore = score) }
+                }.onFailure { error ->
+                    _uiState.update { it.copy(error = "Failed to load score: ${error.message}") }
+                }
+            }
         }
-
-        return (weightedPopularitySum / totalWeight).toInt()
     }
 
     fun onRetry() { initialise() }
