@@ -1,5 +1,9 @@
-package com.arekb.cadence.ui.screens.login
+package com.arekb.cadence.feature.login
 
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,28 +26,59 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.arekb.cadence.core.ui.R
 import com.arekb.cadence.core.ui.component.CadenceErrorState
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationResponse
 
 //TODO: REVAMP!
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    onLoginRequested: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    val spotifyAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val response = AuthorizationClient.getResponse(result.resultCode, result.data)
+        when (response.type) {
+            AuthorizationResponse.Type.CODE -> {
+                response.code?.let { code ->
+                    viewModel.onAuthCodeReceived(code)
+                }
+            }
+            AuthorizationResponse.Type.ERROR -> {
+                // Log error or show toast
+                Toast.makeText(context, "Login error: ${response.error}", Toast.LENGTH_SHORT).show()
+            }
+            else -> { /* Cancelled or Empty */ }
+        }
+    }
 
     // Listen for one-time events from the ViewModel
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collect { event ->
             when (event) {
-                is LoginViewModel.LoginViewEvent.StartSdkLogin -> onLoginRequested()
-                is LoginViewModel.LoginViewEvent.NavigateToHome -> onLoginSuccess()
+                is LoginViewModel.LoginViewEvent.StartSdkLogin -> {
+                    // Logic moved from MainActivity to here!
+                    val request = viewModel.getAuthorizationRequest() // You might need to add this getter to VM
+                    val intent = AuthorizationClient.createLoginActivityIntent(
+                        context as Activity,
+                        request
+                    )
+                    spotifyAuthLauncher.launch(intent)
+                }
+                is LoginViewModel.LoginViewEvent.NavigateToHome -> {
+                    onLoginSuccess()
+                }
             }
         }
     }

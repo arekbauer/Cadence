@@ -2,15 +2,22 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
-    namespace = "com.arekb.cadence.core.ui"
+    namespace = "com.arekb.cadence.feature.login"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
+        manifestPlaceholders += mapOf(
+            "redirectSchemeName" to "cadence-app",
+            "redirectHostName" to "callback",
+            "redirectPathPattern" to ".*"
+        )
         minSdk = 29
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -37,13 +44,27 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
+    implementation(project(":core:ui"))
+
+    // Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.coil.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.graphics.shapes)
+    implementation(libs.androidx.paging.compose)
 
-    implementation(libs.coil.compose)
+    // Spotify
+    //noinspection UseTomlInstead
+    implementation("com.spotify.android:auth:3.0.0")
 }

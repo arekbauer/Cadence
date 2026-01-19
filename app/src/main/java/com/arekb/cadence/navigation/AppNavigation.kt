@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui
+package com.arekb.cadence.navigation
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -6,8 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavType
@@ -15,25 +13,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.arekb.cadence.core.data.repository.AuthRepository
 import com.arekb.cadence.feature.analytics.artists.TopArtistsScreen
 import com.arekb.cadence.feature.analytics.genres.GenresScreen
 import com.arekb.cadence.feature.analytics.tracks.TopTracksScreen
 import com.arekb.cadence.feature.artist.ArtistScreen
 import com.arekb.cadence.feature.home.HomeScreen
+import com.arekb.cadence.feature.login.LoginScreen
 import com.arekb.cadence.feature.search.SearchScreen
-import com.arekb.cadence.ui.screens.login.LoginScreen
-import com.arekb.cadence.ui.screens.login.LoginViewModel
-import kotlinx.coroutines.launch
 
 @Composable
-fun AppNavigation(
-    authRepository: AuthRepository,
-    loginViewModel: LoginViewModel,
-    onLoginRequested: () -> Unit
-) {
+fun AppNavigation() {
     val navController = rememberNavController()
-    val coroutineScope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
 
     // Animations
@@ -59,18 +49,6 @@ fun AppNavigation(
         animationSpec = animationSpec
     )
 
-    // Check the login state asynchronously
-    LaunchedEffect(key1 = Unit) {
-        coroutineScope.launch {
-            if (authRepository.isLoggedIn()) {
-                // If logged in, navigate to home screen
-                navController.navigate("home") {
-                    popUpTo("login") { inclusive = true }
-                }
-            }
-        }
-    }
-
     // Start navigation is always login, the LaunchedEffect will navigate to home if logged in
     NavHost(navController = navController, startDestination = "login") {
         composable(
@@ -79,8 +57,6 @@ fun AppNavigation(
             exitTransition = { fadeOut(animationSpec = tween(700)) }
         ){
             LoginScreen(
-                viewModel = loginViewModel,
-                onLoginRequested = onLoginRequested,
                 onLoginSuccess = {
                     navController.navigate("home") {
                         popUpTo("login") { inclusive = true }

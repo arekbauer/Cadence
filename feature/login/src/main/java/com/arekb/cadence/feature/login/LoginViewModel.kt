@@ -1,8 +1,9 @@
-package com.arekb.cadence.ui.screens.login
+package com.arekb.cadence.feature.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arekb.cadence.core.data.repository.AuthRepository
+import com.spotify.sdk.android.auth.AuthorizationRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,6 +24,18 @@ class LoginViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<LoginViewEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    init {
+        checkIfAlreadyLoggedIn()
+    }
+
+    private fun checkIfAlreadyLoggedIn() {
+        viewModelScope.launch {
+            if (authRepository.isLoggedIn()) {
+                _eventFlow.emit(LoginViewEvent.NavigateToHome)
+            }
+        }
+    }
+
     fun onLoginClicked() {
         viewModelScope.launch {
             _eventFlow.emit(LoginViewEvent.StartSdkLogin)
@@ -42,6 +55,10 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun getAuthorizationRequest(): AuthorizationRequest {
+        return authRepository.getAuthorizationRequest()
     }
 
     sealed interface LoginViewEvent {
