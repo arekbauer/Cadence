@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.stats
+package com.arekb.cadence.core.ui.component.skeleton
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.arekb.cadence.ui.screens.common.shimmer
 
 /**
  * The main skeleton layout that mimics the structure of the real screen.

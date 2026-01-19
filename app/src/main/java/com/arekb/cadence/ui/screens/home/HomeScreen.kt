@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularWavyProgressIndicator
@@ -31,7 +30,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -64,6 +62,8 @@ import coil.request.ImageRequest
 import com.arekb.cadence.R
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Track
+import com.arekb.cadence.core.ui.component.CadenceErrorState
+import com.arekb.cadence.core.ui.component.CadenceLoader
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -94,16 +94,14 @@ fun HomeScreen(
         ){
             when {
                 uiState.isLoading -> {
-                    LoadingIndicator()
+                    CadenceLoader()
                 }
 
                 uiState.error != null -> {
-                    Column {
-                        Text(text = "Error loading profile: " + uiState.error!!)
-                        Button(onClick = { viewModel.onRetry() }) {
-                            Text("Retry")
-                        }
-                    }
+                    CadenceErrorState(
+                        message = "Error loading profile",
+                        onRetry = viewModel::onRetry,
+                    )
                 }
 
                 uiState.userProfile != null -> {

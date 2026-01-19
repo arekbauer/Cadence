@@ -8,9 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.arekb.cadence.core.data.repository.AuthRepository
+import com.arekb.cadence.core.ui.theme.CadenceTheme
 import com.arekb.cadence.ui.AppNavigation
 import com.arekb.cadence.ui.screens.login.LoginViewModel
-import com.arekb.cadence.ui.theme.CadenceTheme
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import dagger.hilt.android.AndroidEntryPoint

@@ -70,6 +70,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Genre
+import com.arekb.cadence.core.ui.component.CadenceErrorState
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.pow
@@ -123,7 +124,9 @@ fun GenresScreen(
                     GenresScreenSkeleton()
                 }
                 uiState.error != null -> {
-                    Text(text = uiState.error!!)
+                    CadenceErrorState(
+                        message = "Error loading top genres"
+                    )
                 }
                 else -> {
                     val genres = uiState.topGenres.take(NUMBER_OF_GENRES)

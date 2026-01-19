@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.arekb.cadence.R
+import com.arekb.cadence.core.ui.component.CadenceErrorState
 
 //TODO: REVAMP!
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -83,8 +84,9 @@ fun LoginScreen(
                 }
 
                 uiState.error?.let { error ->
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = error, color = MaterialTheme.colorScheme.error)
+                    CadenceErrorState(
+                        message = error
+                    )
                 }
             }
         }

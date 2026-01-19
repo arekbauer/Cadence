@@ -71,6 +71,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.arekb.cadence.R
 import com.arekb.cadence.core.model.SearchResult
+import com.arekb.cadence.core.ui.component.CadenceErrorState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -288,9 +289,9 @@ fun SearchResultsGrid(pagingItems: LazyPagingItems<SearchResult>,
             }
         }
         is LoadState.Error -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Error: ${state.error.message}")
-            }
+            CadenceErrorState(
+                message = "Error searching"
+            )
         }
         else -> {
             LazyVerticalGrid(

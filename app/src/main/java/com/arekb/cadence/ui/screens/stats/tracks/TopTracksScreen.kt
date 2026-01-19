@@ -54,11 +54,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.arekb.cadence.ui.screens.stats.StatRow
-import com.arekb.cadence.ui.screens.stats.StatsScreenSkeleton
-import com.arekb.cadence.ui.screens.stats.StatsTimeRangeToolbar
-import com.arekb.cadence.ui.screens.stats.ThreeTwoCard
-import com.arekb.cadence.ui.screens.stats.TopStatHeroCard
+import com.arekb.cadence.core.ui.component.CadenceErrorState
+import com.arekb.cadence.core.ui.component.StatRow
+import com.arekb.cadence.core.ui.component.skeleton.StatsScreenSkeleton
+import com.arekb.cadence.core.ui.component.StatsTimeRangeToolbar
+import com.arekb.cadence.core.ui.component.ThreeTwoCard
+import com.arekb.cadence.core.ui.component.TopStatHeroCard
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
@@ -156,9 +157,8 @@ fun TopTracksScreen(
                             StatsScreenSkeleton()
                         }
                         uiState.error != null -> {
-                            Text(
-                                text = uiState.error!!,
-                                modifier = Modifier.align(Alignment.Center)
+                            CadenceErrorState(
+                                message = "Error loading top tracks"
                             )
                         }
                         else -> {

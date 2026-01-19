@@ -43,7 +43,6 @@ import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
@@ -80,6 +79,8 @@ import com.arekb.cadence.R
 import com.arekb.cadence.core.model.Album
 import com.arekb.cadence.core.model.Artist
 import com.arekb.cadence.core.model.Track
+import com.arekb.cadence.core.ui.component.CadenceErrorState
+import com.arekb.cadence.core.ui.component.CadenceLoader
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -118,10 +119,12 @@ fun ArtistScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    LoadingIndicator()
+                    CadenceLoader()
                 }
                 uiState.error != null -> {
-                    Text("Error: ${uiState.error}")
+                    CadenceErrorState(
+                        message = "Error loading artist profile"
+                    )
                 }
                 uiState.artistDetails != null -> {
                     ArtistDetailsContent(

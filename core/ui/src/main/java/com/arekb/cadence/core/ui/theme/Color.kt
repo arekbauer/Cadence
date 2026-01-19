@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.theme
+package com.arekb.cadence.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.theme
+package com.arekb.cadence.core.ui.theme
 
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Typography
@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.arekb.cadence.R
+import com.arekb.cadence.core.ui.R
 
 /**
  *  Defines the brand typeface using the variable font Roboto Flex.

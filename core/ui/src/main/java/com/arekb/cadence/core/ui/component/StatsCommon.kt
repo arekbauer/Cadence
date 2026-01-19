@@ -1,4 +1,4 @@
-package com.arekb.cadence.ui.screens.stats
+package com.arekb.cadence.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -222,7 +222,7 @@ fun StatRow(
             .padding(bottom = 4.dp)
             .clip(RoundedCornerShape(12.dp))
             .clickable { /* Handle track click if needed */ },
-        // --- Leading Content: The Rank ---
+        // Rank
         leadingContent = {
             Text(
                 text = rank.toString().padStart(2, '0'),
@@ -230,7 +230,7 @@ fun StatRow(
                 color = MaterialTheme.colorScheme.primary,
             )
         },
-        // --- Headline Content: The Track Name ---
+        // Name
         headlineContent = {
             Text(
                 text = name,
@@ -238,7 +238,7 @@ fun StatRow(
                 maxLines = 1
             )
         },
-        // --- Supporting Content: The Artist Names ---
+        // Artist names
         supportingContent = {
             if (artistNames != null) {
                 Text(
@@ -248,7 +248,7 @@ fun StatRow(
                 )
             }
         },
-        // --- Trailing Content: The Album Art ---
+        // Album art
         trailingContent = {
             Card(
                 modifier = Modifier.size(56.dp),

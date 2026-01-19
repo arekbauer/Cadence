@@ -26,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.arekb.cadence.ui.screens.common.shimmer
+import com.arekb.cadence.core.ui.component.skeleton.shimmer
 
 @Composable
 fun GenresScreenSkeleton() {
