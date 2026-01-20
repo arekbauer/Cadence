@@ -30,7 +30,7 @@ android {
         fun getApiKey(propertyKey: String, envKey: String): String {
             return localProperties.getProperty(propertyKey)
                 ?: System.getenv(envKey)
-                ?: "\"MISSING_KEY\"" // Fallback to avoid build crash, but app might fail at runtime if key is needed
+                ?: "MISSING_KEY" // Fallback to avoid build crash, but app might fail at runtime if key is needed
         }
 
         buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${getApiKey("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_ID")}\"")
