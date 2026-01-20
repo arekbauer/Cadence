@@ -22,14 +22,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Build the App
       - name: Build Debug APK
         run: ./gradlew assembleDebug
 
-      # Run Lint Checks
       - name: Run Lint
         run: ./gradlew lintDebug
 
-      # Run Unit Tests
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+            name: cadence-debug-apk
+            path: app/build/outputs/apk/debug/app-debug.apk

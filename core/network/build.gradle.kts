@@ -21,13 +21,20 @@ android {
 
         // Grabbing my private keys
         val localProperties = Properties()
-        val localPropertiesFile = rootProject.file("local.properties")
-        localProperties.load(FileInputStream(localPropertiesFile))
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localProperties.load(FileInputStream(localFile))
+        }
 
-        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${localProperties.getProperty("SPOTIFY_CLIENT_ID")}\"")
-        buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"${localProperties.getProperty("SPOTIFY_CLIENT_SECRET")}\"")
-        buildConfigField("String", "SPOTIFY_BASE_URL", "\"https://api.spotify.com/v1/\"")
-        buildConfigField("String", "SPOTIFY_AUTH_URL", "\"https://accounts.spotify.com/\"")
+        // Helper function to get value from Property File OR Environment Variable
+        fun getApiKey(propertyKey: String, envKey: String): String {
+            return localProperties.getProperty(propertyKey)
+                ?: System.getenv(envKey)
+                ?: "\"MISSING_KEY\"" // Fallback to avoid build crash, but app might fail at runtime if key is needed
+        }
+
+        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${getApiKey("SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_ID")}\"")
+        buildConfigField("String", "SPOTIFY_CLIENT_SECRET", "\"${getApiKey("SPOTIFY_CLIENT_SECRET", "SPOTIFY_CLIENT_SECRET")}\"")
     }
 
     buildFeatures {
